@@ -11,7 +11,7 @@ SOS Game created in sprints.
 
 ### Play the Game Online
 
-You can play the game directly by visiting [this link](null).
+You can play the game directly by visiting [this link](https://talen1.github.io/SOS-game/).
 
 ### Platforms Used
 
