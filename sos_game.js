@@ -5,7 +5,6 @@ let gameOver = false;
 let blueScore = 0;
 let redScore = 0;
 let gameMode = 'simple'; // Default game mode is 'simple'
-let canvas, ctx;
 
 function startNewGame() {
     boardSize = parseInt(document.getElementById('boardSize').value);
@@ -80,20 +79,21 @@ function handleCellClick(event) {
     drawBoard();
 
     const sosFormed = checkForSOS(row, col);
-    
     if (gameMode === 'simple') {
         if (sosFormed) {
-            // End the game as soon as the first SOS is formed in simple mode
-            endGame();
+            endGame(); // End the game as soon as the first SOS is formed
         } else {
             switchPlayer();
         }
     } else if (gameMode === 'general') {
-        if (!sosFormed) {
-            switchPlayer(); // If no SOS is formed, switch player
+        if (sosFormed) {
+            // In general mode, the player gets another turn if they formed an SOS
+            return;
+        } else {
+            switchPlayer();
         }
         if (isBoardFull()) {
-            endGame(); // End the game when the board is full in general mode
+            endGame(); // End the game when the board is full
         }
     }
 
