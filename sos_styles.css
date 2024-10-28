@@ -1,0 +1,49 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    position: relative;
+    z-index: 1; /* Ensures the table is above the canvas */
+}
+
+td {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    border: 1px solid #000;
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+}
+
+.game-container {
+    margin: 20px auto;
+    position: relative;
+}
+
+.canvas-container {
+    position: relative;
+    display: inline-block;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0; /* Draw the lines beneath the table content */
+    pointer-events: none; /* Prevent interference with cell clicks */
+}
+
+.winner {
+    margin-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
