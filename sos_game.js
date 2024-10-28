@@ -7,6 +7,7 @@ let redScore = 0;
 let gameMode = 'simple'; // Default game mode is 'simple'
 let canvas, ctx;
 
+// Start a new game
 function startNewGame() {
     boardSize = parseInt(document.getElementById('boardSize').value);
     board = Array(boardSize).fill().map(() => Array(boardSize).fill(''));
@@ -23,6 +24,7 @@ function startNewGame() {
     drawBoard();
 }
 
+// Setup the canvas for drawing
 function setupCanvas() {
     const boardContainer = document.getElementById('gameBoard');
     boardContainer.innerHTML = '';
@@ -58,6 +60,7 @@ function setupCanvas() {
     }
 }
 
+// Draw the board
 function drawBoard() {
     const table = document.querySelector('table');
     for (let i = 0; i < boardSize; i++) {
@@ -68,9 +71,10 @@ function drawBoard() {
     }
 }
 
+// Handle cell click event
 function handleCellClick(event) {
-    const row = event.target.dataset.row;
-    const col = event.target.dataset.col;
+    const row = parseInt(event.target.dataset.row);
+    const col = parseInt(event.target.dataset.col);
 
     if (board[row][col] !== '' || gameOver) return; // Ignore clicks on occupied cells or when game over
 
@@ -103,10 +107,12 @@ function handleCellClick(event) {
     }
 }
 
+// Switch the current player
 function switchPlayer() {
     currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
 }
 
+// Check for SOS formation
 function checkForSOS(row, col) {
     const sosSequences = [
         [[0, -2], [0, -1], [0, 1]], // Horizontal
@@ -129,11 +135,12 @@ function checkForSOS(row, col) {
     return sosFound;
 }
 
+// Check if an SOS sequence exists
 function isSOS(row, col, prev, current, next) {
-    const prevRow = parseInt(row) + prev[0];
-    const prevCol = parseInt(col) + prev[1];
-    const nextRow = parseInt(row) + next[0];
-    const nextCol = parseInt(col) + next[1];
+    const prevRow = row + prev[0];
+    const prevCol = col + prev[1];
+    const nextRow = row + next[0];
+    const nextCol = col + next[1];
 
     if (
         prevRow >= 0 && prevRow < boardSize &&
@@ -149,15 +156,17 @@ function isSOS(row, col, prev, current, next) {
     return false;
 }
 
+// Draw SOS line based on the current player's color
 function drawSOSLine(row, col, prev, next) {
-    const cellSize = 50;  // Adjust this based on your cell size
+    const table = document.querySelector('table');
+    const cellSize = table.rows[0].cells[0].offsetWidth;  // Dynamically calculate cell size
     const color = currentPlayer === 'blue' ? 'blue' : 'red';
 
     // Calculate the start and end coordinates for the line
-    const startX = (parseInt(col) + prev[1]) * cellSize + cellSize / 2;
-    const startY = (parseInt(row) + prev[0]) * cellSize + cellSize / 2;
-    const endX = (parseInt(col) + next[1]) * cellSize + cellSize / 2;
-    const endY = (parseInt(row) + next[0]) * cellSize + cellSize / 2;
+    const startX = (col + prev[1]) * cellSize + cellSize / 2;
+    const startY = (row + prev[0]) * cellSize + cellSize / 2;
+    const endX = (col + next[1]) * cellSize + cellSize / 2;
+    const endY = (row + next[0]) * cellSize + cellSize / 2;
 
     // Draw the line on the canvas
     ctx.strokeStyle = color;
@@ -168,6 +177,7 @@ function drawSOSLine(row, col, prev, next) {
     ctx.stroke();
 }
 
+// Update the player's score
 function updateScore() {
     if (currentPlayer === 'blue') {
         blueScore++;
@@ -176,10 +186,12 @@ function updateScore() {
     }
 }
 
+// Check if the board is full
 function isBoardFull() {
     return board.every(row => row.every(cell => cell !== ''));
 }
 
+// End the game and display the winner
 function endGame() {
     gameOver = true;
     let winnerText;
@@ -197,6 +209,7 @@ function endGame() {
     document.getElementById('winnerDisplay').textContent = winnerText;
 }
 
+// Check if it's the computer's turn
 function isComputerTurn() {
     const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
     const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
@@ -204,6 +217,7 @@ function isComputerTurn() {
            (currentPlayer === 'red' && redPlayerType === 'computer');
 }
 
+// Make a move for the computer
 function makeComputerMove() {
     let availableMoves = [];
     for (let i = 0; i < boardSize; i++) {
@@ -218,18 +232,4 @@ function makeComputerMove() {
         const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
         const row = randomMove[0];
         const col = randomMove[1];
-        const piece = currentPlayer === 'blue'
-            ? document.querySelector('input[name="bluePiece"]:checked').value
-            : document.querySelector('input[name="redPiece"]:checked').value;
-
-        board[row][col] = piece;
-        drawBoard();
-
-        const sosFormed = checkForSOS(row, col);
-        if (!sosFormed) {
-            switchPlayer();
-        }
-    }
-}
-
-window.onload = startNewGame;
+        const piece = current
