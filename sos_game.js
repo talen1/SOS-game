@@ -14,10 +14,10 @@ function startNewGame() {
     gameOver = false;
     blueScore = 0;
     redScore = 0;
-    gameMode = document.querySelector('input[name="gameMode"]:checked').value; // Get game mode
+    gameMode = document.querySelector('input[name="gameMode"]:checked').value;
     document.getElementById('winnerDisplay').textContent = '';
 
-    // Set up canvas
+    // Set up the canvas
     setupCanvas();
     drawBoard();
 }
@@ -25,7 +25,7 @@ function startNewGame() {
 function setupCanvas() {
     const boardContainer = document.getElementById('gameBoard');
     boardContainer.innerHTML = '';
-    
+
     const table = document.createElement('table');
     for (let i = 0; i < boardSize; i++) {
         const row = document.createElement('tr');
@@ -52,7 +52,7 @@ function setupCanvas() {
     canvas.style.position = 'absolute';
     canvas.style.top = `${table.offsetTop}px`;
     canvas.style.left = `${table.offsetLeft}px`;
-    canvas.style.pointerEvents = 'none'; // Prevent interference with cell clicks
+    canvas.style.pointerEvents = 'none'; // Prevent interference with clicks
     ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
 }
@@ -153,13 +153,14 @@ function isSOS(row, col, prev, current, next) {
 }
 
 function drawSOSLine(row, col, prev, current, next) {
-    const cellSize = 50; // Each cell is 50px wide and high
+    const table = document.querySelector('table');
+    const cellSize = table.rows[0].cells[0].offsetWidth; // Get the cell size
     const color = currentPlayer === 'blue' ? 'blue' : 'red';
 
-    const startX = (col + next[1]) * cellSize + cellSize / 2;
-    const startY = (row + next[0]) * cellSize + cellSize / 2;
-    const endX = (col + prev[1]) * cellSize + cellSize / 2;
-    const endY = (row + prev[0]) * cellSize + cellSize / 2;
+    const startX = (col + next[1] + 0.5) * cellSize;
+    const startY = (row + next[0] + 0.5) * cellSize;
+    const endX = (col + prev[1] + 0.5) * cellSize;
+    const endY = (row + prev[0] + 0.5) * cellSize;
 
     ctx.strokeStyle = color;
     ctx.lineWidth = 5;
