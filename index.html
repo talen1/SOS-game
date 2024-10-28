@@ -16,6 +16,8 @@
         table {
             margin: 0 auto;
             border-collapse: collapse;
+            position: relative;
+            z-index: 1;
         }
         td {
             width: 50px;
@@ -23,16 +25,19 @@
             text-align: center;
             border: 1px solid #000;
             font-size: 24px;
+            cursor: pointer;
             position: relative;
         }
         .canvas-container {
             position: relative;
+            display: inline-block;
         }
         canvas {
             position: absolute;
             top: 0;
             left: 0;
-            pointer-events: none; /* To prevent canvas from interfering with cell clicks */
+            z-index: 0;
+            pointer-events: none; /* Prevent interference with clicks */
         }
         .controls {
             margin-top: 20px;
@@ -47,49 +52,45 @@
 <body>
     <h1>SOS Game</h1>
 
-    <div class="game-container">
-        <!-- Game Controls -->
-        <div class="controls">
-            <!-- Board Size -->
-            <label for="boardSize">Board size: </label>
-            <input type="number" id="boardSize" value="8" min="3">
-            <br>
+    <div class="controls">
+        <label for="boardSize">Board size: </label>
+        <input type="number" id="boardSize" value="8" min="3">
+        <br>
 
-            <!-- Game Mode Selection -->
-            <h3>Select Game Mode:</h3>
-            <label><input type="radio" name="gameMode" value="simple" checked> Simple Game</label>
-            <label><input type="radio" name="gameMode" value="general"> General Game</label>
-            <br>
+        <h3>Select Game Mode:</h3>
+        <label><input type="radio" name="gameMode" value="simple" checked> Simple Game</label>
+        <label><input type="radio" name="gameMode" value="general"> General Game</label>
+        <br>
 
-            <!-- Start New Game Button -->
-            <button onclick="startNewGame()">New Game</button>
-        </div>
-
-        <!-- Player Controls -->
-        <div id="players">
-            <!-- Blue Player -->
-            <h3>Blue Player</h3>
-            <label><input type="radio" name="bluePlayerType" value="human" checked> Human</label>
-            <label><input type="radio" name="bluePlayerType" value="computer"> Computer</label>
-            <br>
-            <label><input type="radio" name="bluePiece" value="S" checked> S</label>
-            <label><input type="radio" name="bluePiece" value="O"> O</label>
-
-            <!-- Red Player -->
-            <h3>Red Player</h3>
-            <label><input type="radio" name="redPlayerType" value="human" checked> Human</label>
-            <label><input type="radio" name="redPlayerType" value="computer"> Computer</label>
-            <br>
-            <label><input type="radio" name="redPiece" value="S" checked> S</label>
-            <label><input type="radio" name="redPiece" value="O"> O</label>
-        </div>
-
-        <!-- Game Board -->
-        <div id="gameBoard"></div>
-
-        <!-- Winner Display -->
-        <div class="winner" id="winnerDisplay"></div>
+        <button onclick="startNewGame()">New Game</button>
     </div>
+
+    <div id="players" class="controls">
+        <!-- Blue Player Controls -->
+        <h3>Blue Player</h3>
+        <label><input type="radio" name="bluePlayerType" value="human" checked> Human</label>
+        <label><input type="radio" name="bluePlayerType" value="computer"> Computer</label>
+        <br>
+        <label><input type="radio" name="bluePiece" value="S" checked> S</label>
+        <label><input type="radio" name="bluePiece" value="O"> O</label>
+
+        <!-- Red Player Controls -->
+        <h3>Red Player</h3>
+        <label><input type="radio" name="redPlayerType" value="human" checked> Human</label>
+        <label><input type="radio" name="redPlayerType" value="computer"> Computer</label>
+        <br>
+        <label><input type="radio" name="redPiece" value="S" checked> S</label>
+        <label><input type="radio" name="redPiece" value="O"> O</label>
+    </div>
+
+    <div class="game-container">
+        <!-- Game Board and Canvas Container -->
+        <div id="gameBoard" class="canvas-container"></div>
+        <!-- Canvas for drawing lines -->
+        <canvas id="sosCanvas"></canvas>
+    </div>
+
+    <div class="winner" id="winnerDisplay"></div>
 
     <!-- JavaScript File -->
     <script src="sos_game.js"></script>
