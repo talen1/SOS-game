@@ -12,6 +12,7 @@
         .game-container {
             margin: 20px auto;
             position: relative;
+            width: fit-content;
         }
         table {
             margin: 0 auto;
@@ -23,16 +24,7 @@
             text-align: center;
             border: 1px solid #000;
             font-size: 24px;
-            position: relative;
-        }
-        .canvas-container {
-            position: relative;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none; /* To prevent canvas from interfering with cell clicks */
+            cursor: pointer;
         }
         .controls {
             margin-top: 20px;
@@ -41,6 +33,12 @@
             margin-top: 20px;
             font-size: 24px;
             font-weight: bold;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;  /* Allow clicks through the canvas */
         }
     </style>
 </head>
