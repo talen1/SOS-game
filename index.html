@@ -5,93 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOS Game</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .game-container {
-            margin: 20px auto;
-            position: relative;
-        }
-        table {
-            margin: 0 auto;
-            border-collapse: collapse;
-        }
-        td {
-            width: 50px;
-            height: 50px;
-            text-align: center;
-            border: 1px solid #000;
-            font-size: 24px;
-            position: relative;
-        }
-        .canvas-container {
-            position: relative;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none; /* To prevent canvas from interfering with cell clicks */
-        }
-        .controls {
-            margin-top: 20px;
-        }
-        .winner {
-            margin-top: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
+        #game-board { display: grid; }
+        .cell { width: 50px; height: 50px; border: 1px solid black; text-align: center; }
     </style>
 </head>
 <body>
     <h1>SOS Game</h1>
-
-    <div class="game-container">
-        <!-- Game Controls -->
-        <div class="controls">
-            <!-- Board Size -->
-            <label for="boardSize">Board size: </label>
-            <input type="number" id="boardSize" value="8" min="3">
-            <br>
-
-            <!-- Game Mode Selection -->
-            <h3>Select Game Mode:</h3>
-            <label><input type="radio" name="gameMode" value="simple" checked> Simple Game</label>
-            <label><input type="radio" name="gameMode" value="general"> General Game</label>
-            <br>
-
-            <!-- Start New Game Button -->
-            <button onclick="startNewGame()">New Game</button>
-        </div>
-
-        <!-- Player Controls -->
-        <div id="players">
-            <!-- Blue Player -->
-            <h3>Blue Player</h3>
-            <label><input type="radio" name="bluePlayerType" value="human" checked> Human</label>
-            <label><input type="radio" name="bluePlayerType" value="computer"> Computer</label>
-            <br>
-            <label><input type="radio" name="bluePiece" value="S" checked> S</label>
-            <label><input type="radio" name="bluePiece" value="O"> O</label>
-
-            <!-- Red Player -->
-            <h3>Red Player</h3>
-            <label><input type="radio" name="redPlayerType" value="human" checked> Human</label>
-            <label><input type="radio" name="redPlayerType" value="computer"> Computer</label>
-            <br>
-            <label><input type="radio" name="redPiece" value="S" checked> S</label>
-            <label><input type="radio" name="redPiece" value="O"> O</label>
-        </div>
-
-        <!-- Game Board -->
-        <div id="gameBoard"></div>
-
-        <!-- Winner Display -->
-        <div class="winner" id="winnerDisplay"></div>
+    <div>
+        <button onclick="startGame(5, true)">Start Simple Game</button>
+        <button onclick="startGame(5, false)">Start General Game</button>
     </div>
+    <div id="game-board"></div>
 
-    <!-- JavaScript File -->
-    <script src="sos_game.js"></script>
+    <script>
+        function startGame(size, simpleMode) {
+            let board = document.getElementById('game-board');
+            board.style.gridTemplateColumns = `repeat(${size}, 50px)`;
+            board.innerHTML = '';
+            for (let i = 0; i < size * size; i++) {
+                let cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.addEventListener('click', () => makeMove(i));
+                board.appendChild(cell);
+            }
+        }
+
+        function makeMove(index) {
+            // Logic to interact with backend
+            alert(`Move at index ${index}`);
+        }
+    </script>
 </body>
 </html>
