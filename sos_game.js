@@ -26,7 +26,7 @@ function startNewGame() {
 function setupCanvas() {
     const boardContainer = document.getElementById('gameBoard');
     boardContainer.innerHTML = '';
-    
+
     const table = document.createElement('table');
     for (let i = 0; i < boardSize; i++) {
         const row = document.createElement('tr');
@@ -47,8 +47,10 @@ function setupCanvas() {
         canvas = document.createElement('canvas');
         canvas.width = table.clientWidth;
         canvas.height = table.clientHeight;
+        canvas.style.position = 'absolute';
         canvas.style.top = `${table.offsetTop}px`;
         canvas.style.left = `${table.offsetLeft}px`;
+        canvas.style.pointerEvents = 'none';  // Allow cell clicks through the canvas
         ctx = canvas.getContext('2d');
         boardContainer.appendChild(canvas);
     } else {
@@ -83,17 +85,16 @@ function handleCellClick(event) {
     
     if (gameMode === 'simple') {
         if (sosFormed) {
-            // End the game as soon as the first SOS is formed in simple mode
-            endGame();
+            endGame(); // End the game when an SOS is formed
         } else {
             switchPlayer();
         }
     } else if (gameMode === 'general') {
         if (!sosFormed) {
-            switchPlayer(); // If no SOS is formed, switch player
+            switchPlayer(); // Switch turn if no SOS formed
         }
         if (isBoardFull()) {
-            endGame(); // End the game when the board is full in general mode
+            endGame(); // End the game when the board is full
         }
     }
 
@@ -107,12 +108,11 @@ function switchPlayer() {
 }
 
 function checkForSOS(row, col) {
-    const piece = board[row][col];
     const sosSequences = [
-        [[0, -2], [0, -1], [0, 1], [0, 2]], // Horizontal
-        [[-2, 0], [-1, 0], [1, 0], [2, 0]], // Vertical
-        [[-2, -2], [-1, -1], [1, 1], [2, 2]], // Diagonal \
-        [[-2, 2], [-1, 1], [1, -1], [2, -2]] // Diagonal /
+        [[0, -2], [0, -1], [0, 1]], // Horizontal
+        [[-2, 0], [-1, 0], [1, 0]], // Vertical
+        [[-2, -2], [-1, -1], [1, 1]], // Diagonal \
+        [[-2, 2], [-1, 1], [1, -1]]  // Diagonal /
     ];
 
     let sosFound = false;
@@ -121,7 +121,7 @@ function checkForSOS(row, col) {
         const [prev, current, next] = direction;
         if (isSOS(row, col, prev, current, next)) {
             sosFound = true;
-            drawSOSLine(row, col, prev, current, next);
+            drawSOSLine(row, col, prev, next);
             updateScore();
         }
     });
@@ -132,38 +132,36 @@ function checkForSOS(row, col) {
 function isSOS(row, col, prev, current, next) {
     const prevRow = parseInt(row) + prev[0];
     const prevCol = parseInt(col) + prev[1];
-    const currentRow = parseInt(row) + current[0];
-    const currentCol = parseInt(col) + current[1];
     const nextRow = parseInt(row) + next[0];
     const nextCol = parseInt(col) + next[1];
 
     if (
         prevRow >= 0 && prevRow < boardSize &&
         prevCol >= 0 && prevCol < boardSize &&
-        currentRow >= 0 && currentRow < boardSize &&
-        currentCol >= 0 && currentCol < boardSize &&
         nextRow >= 0 && nextRow < boardSize &&
         nextCol >= 0 && nextCol < boardSize
     ) {
         return board[prevRow][prevCol] === 'S' &&
-               board[currentRow][currentCol] === 'O' &&
+               board[row][col] === 'O' &&
                board[nextRow][nextCol] === 'S';
     }
 
     return false;
 }
 
-function drawSOSLine(row, col, prev, current, next) {
-    const cellSize = 50; // Each cell is 50px wide and high
+function drawSOSLine(row, col, prev, next) {
+    const cellSize = 50;  // Adjust this based on your cell size
     const color = currentPlayer === 'blue' ? 'blue' : 'red';
 
-    const startX = (parseInt(col) + next[1]) * cellSize + cellSize / 2;
-    const startY = (parseInt(row) + next[0]) * cellSize + cellSize / 2;
-    const endX = (parseInt(col) + prev[1]) * cellSize + cellSize / 2;
-    const endY = (parseInt(row) + prev[0]) * cellSize + cellSize / 2;
+    // Calculate the start and end coordinates for the line
+    const startX = (parseInt(col) + prev[1]) * cellSize + cellSize / 2;
+    const startY = (parseInt(row) + prev[0]) * cellSize + cellSize / 2;
+    const endX = (parseInt(col) + next[1]) * cellSize + cellSize / 2;
+    const endY = (parseInt(row) + next[0]) * cellSize + cellSize / 2;
 
+    // Draw the line on the canvas
     ctx.strokeStyle = color;
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(startX, startY);
     ctx.lineTo(endX, endY);
@@ -184,23 +182,25 @@ function isBoardFull() {
 
 function endGame() {
     gameOver = true;
+    let winnerText;
     if (gameMode === 'simple') {
-        const winnerText = currentPlayer === 'blue' ? 'Blue wins!' : 'Red wins!';
-        document.getElementById('winnerDisplay').textContent = winnerText;
+        winnerText = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)} wins!`;
     } else if (gameMode === 'general') {
-        const winnerText = blueScore > redScore
-            ? 'Blue wins!'
-            : redScore > blueScore
-            ? 'Red wins!'
-            : 'It\'s a draw!';
-        document.getElementById('winnerDisplay').textContent = winnerText;
+        if (blueScore > redScore) {
+            winnerText = 'Blue wins!';
+        } else if (redScore > blueScore) {
+            winnerText = 'Red wins!';
+        } else {
+            winnerText = "It's a draw!";
+        }
     }
+    document.getElementById('winnerDisplay').textContent = winnerText;
 }
 
 function isComputerTurn() {
     const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
     const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return (currentPlayer === 'blue' && bluePlayerType === 'computer') || 
+    return (currentPlayer === 'blue' && bluePlayerType === 'computer') ||
            (currentPlayer === 'red' && redPlayerType === 'computer');
 }
 
@@ -224,7 +224,7 @@ function makeComputerMove() {
 
         board[row][col] = piece;
         drawBoard();
-        
+
         const sosFormed = checkForSOS(row, col);
         if (!sosFormed) {
             switchPlayer();
