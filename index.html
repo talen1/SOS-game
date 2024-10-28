@@ -4,50 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOS Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .game-container {
-            margin: 20px auto;
-            position: relative;
-        }
-        table {
-            margin: 0 auto;
-            border-collapse: collapse;
-            position: relative;
-            z-index: 1;
-        }
-        td {
-            width: 50px;
-            height: 50px;
-            text-align: center;
-            border: 1px solid #000;
-            font-size: 24px;
-            cursor: pointer;
-            position: relative;
-        }
-        .canvas-container {
-            position: relative;
-            display: inline-block;
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 0;
-            pointer-events: none; /* Prevent interference with clicks */
-        }
-        .controls {
-            margin-top: 20px;
-        }
-        .winner {
-            margin-top: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="sos_styles.css"> <!-- Link to the CSS file -->
 </head>
 <body>
     <h1>SOS Game</h1>
@@ -84,7 +41,7 @@
     </div>
 
     <div class="game-container">
-        <!-- Game Board and Canvas Container -->
+        <!-- Game Board Container -->
         <div id="gameBoard" class="canvas-container"></div>
         <!-- Canvas for drawing lines -->
         <canvas id="sosCanvas"></canvas>
