@@ -4,8 +4,8 @@ let board = [];
 let gameOver = false;
 let blueScore = 0;
 let redScore = 0;
-let gameMode = 'simple'; // Default game mode is 'simple'
-let ctx; // Canvas context
+let gameMode = 'simple';
+let ctx;
 
 function startNewGame() {
     boardSize = parseInt(document.getElementById('boardSize').value);
@@ -17,7 +17,6 @@ function startNewGame() {
     gameMode = document.querySelector('input[name="gameMode"]:checked').value;
     document.getElementById('winnerDisplay').textContent = '';
 
-    // Set up the canvas
     setupCanvas();
     drawBoard();
 }
@@ -48,6 +47,9 @@ function setupCanvas() {
     }
     canvas.width = table.clientWidth;
     canvas.height = table.clientHeight;
+    canvas.style.position = 'absolute';
+    canvas.style.top = `${table.offsetTop}px`;
+    canvas.style.left = `${table.offsetLeft}px`;
     ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -63,10 +65,12 @@ function drawBoard() {
 }
 
 function handleCellClick(event) {
+    if (gameOver) return;
+
     const row = parseInt(event.target.dataset.row);
     const col = parseInt(event.target.dataset.col);
 
-    if (board[row][col] !== '' || gameOver) return;
+    if (board[row][col] !== '') return;
 
     const piece = currentPlayer === 'blue'
         ? document.querySelector('input[name="bluePiece"]:checked').value
@@ -76,23 +80,25 @@ function handleCellClick(event) {
     drawBoard();
 
     const sosFormed = checkForSOS(row, col);
+
     if (gameMode === 'simple') {
         if (sosFormed) {
-            endGame(currentPlayer); // End the game as soon as the first SOS is formed
+            endGame(currentPlayer);
         } else if (isBoardFull()) {
-            endGame('draw'); // If board is full without SOS, it’s a draw
+            endGame(null); // Draw if no SOS and board is full
         } else {
             switchPlayer();
         }
     } else if (gameMode === 'general') {
         if (sosFormed) {
+            // Player gets another turn if they form an SOS
             updateScore();
-            // Player takes another turn if they form an SOS
         } else {
             switchPlayer();
         }
+
         if (isBoardFull()) {
-            endGame(); // End the game when the board is full
+            endGame(getWinnerByScore()); // End game and check scores
         }
     }
 
@@ -106,6 +112,7 @@ function switchPlayer() {
 }
 
 function checkForSOS(row, col) {
+    const piece = board[row][col];
     const sosSequences = [
         [[0, -2], [0, -1], [0, 1], [0, 2]], // Horizontal
         [[-2, 0], [-1, 0], [1, 0], [2, 0]], // Vertical
@@ -120,6 +127,7 @@ function checkForSOS(row, col) {
         if (isSOS(row, col, prev, current, next)) {
             sosFound = true;
             drawSOSLine(row, col, prev, current, next);
+            updateScore();
         }
     });
 
@@ -180,23 +188,24 @@ function isBoardFull() {
     return board.every(row => row.every(cell => cell !== ''));
 }
 
-function endGame(winner = null) {
+function endGame(winner) {
     gameOver = true;
     let winnerText;
 
     if (gameMode === 'simple') {
-        winnerText = winner === 'draw' ? "It's a draw!" : `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!`;
-    } else {
-        if (blueScore > redScore) {
-            winnerText = 'Blue wins!';
-        } else if (redScore > blueScore) {
-            winnerText = 'Red wins!';
-        } else {
-            winnerText = "It's a draw!";
-        }
+        winnerText = winner ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!` : 'It\'s a draw!';
+    } else if (gameMode === 'general') {
+        winnerText = blueScore > redScore
+            ? 'Blue wins!'
+            : redScore > blueScore
+            ? 'Red wins!'
+            : 'It\'s a draw!';
     }
-
     document.getElementById('winnerDisplay').textContent = winnerText;
+}
+
+function getWinnerByScore() {
+    return blueScore > redScore ? 'blue' : redScore > blueScore ? 'red' : null;
 }
 
 function isComputerTurn() {
@@ -219,4 +228,17 @@ function makeComputerMove() {
     if (availableMoves.length > 0) {
         const [row, col] = availableMoves[Math.floor(Math.random() * availableMoves.length)];
         const piece = currentPlayer === 'blue'
-            ? document.querySelector('input[name
+            ? document.querySelector('input[name="bluePiece"]:checked').value
+            : document.querySelector('input[name="redPiece"]:checked').value;
+
+        board[row][col] = piece;
+        drawBoard();
+
+        const sosFormed = checkForSOS(row, col);
+        if (!sosFormed) {
+            switchPlayer();
+        }
+    }
+}
+
+window.onload = startNewGame;
