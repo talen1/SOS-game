@@ -40,7 +40,6 @@ function setupCanvas() {
     }
     boardContainer.appendChild(table);
 
-    // Create or clear the canvas overlay
     let canvas = document.getElementById('sosCanvas');
     if (!canvas) {
         canvas = document.createElement('canvas');
@@ -49,12 +48,8 @@ function setupCanvas() {
     }
     canvas.width = table.clientWidth;
     canvas.height = table.clientHeight;
-    canvas.style.position = 'absolute';
-    canvas.style.top = `${table.offsetTop}px`;
-    canvas.style.left = `${table.offsetLeft}px`;
-    canvas.style.pointerEvents = 'none'; // Prevent interference with clicks
     ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawings
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawBoard() {
@@ -71,7 +66,7 @@ function handleCellClick(event) {
     const row = parseInt(event.target.dataset.row);
     const col = parseInt(event.target.dataset.col);
 
-    if (board[row][col] !== '' || gameOver) return; // Ignore clicks on occupied cells or when game is over
+    if (board[row][col] !== '' || gameOver) return;
 
     const piece = currentPlayer === 'blue'
         ? document.querySelector('input[name="bluePiece"]:checked').value
@@ -81,24 +76,28 @@ function handleCellClick(event) {
     drawBoard();
 
     const sosFormed = checkForSOS(row, col);
-    if (sosFormed) {
-        updateScore();
-        if (gameMode === 'simple') {
-            endGame(); // End the game as soon as the first SOS is formed
+    if (gameMode === 'simple') {
+        if (sosFormed) {
+            endGame(currentPlayer); // End the game as soon as the first SOS is formed
+        } else if (isBoardFull()) {
+            endGame('draw'); // If board is full without SOS, it’s a draw
         } else {
-            // In general mode, the player gets another turn if they formed an SOS
-            return;
+            switchPlayer();
+        }
+    } else if (gameMode === 'general') {
+        if (sosFormed) {
+            updateScore();
+            // Player takes another turn if they form an SOS
+        } else {
+            switchPlayer();
+        }
+        if (isBoardFull()) {
+            endGame(); // End the game when the board is full
         }
     }
 
-    switchPlayer();
-
-    if (gameMode === 'general' && isBoardFull()) {
-        endGame(); // End the game when the board is full
-    }
-
     if (!gameOver && isComputerTurn()) {
-        setTimeout(makeComputerMove, 500); // Allow the computer to make a move after a short delay
+        setTimeout(makeComputerMove, 500);
     }
 }
 
@@ -107,7 +106,6 @@ function switchPlayer() {
 }
 
 function checkForSOS(row, col) {
-    const piece = board[row][col];
     const sosSequences = [
         [[0, -2], [0, -1], [0, 1], [0, 2]], // Horizontal
         [[-2, 0], [-1, 0], [1, 0], [2, 0]], // Vertical
@@ -121,7 +119,7 @@ function checkForSOS(row, col) {
         const [prev, current, next] = direction;
         if (isSOS(row, col, prev, current, next)) {
             sosFound = true;
-            drawSOSLine(row, col, prev, current, next); // Draw colored line
+            drawSOSLine(row, col, prev, current, next);
         }
     });
 
@@ -154,7 +152,7 @@ function isSOS(row, col, prev, current, next) {
 
 function drawSOSLine(row, col, prev, current, next) {
     const table = document.querySelector('table');
-    const cellSize = table.rows[0].cells[0].offsetWidth; // Get the cell size
+    const cellSize = table.rows[0].cells[0].offsetWidth;
     const color = currentPlayer === 'blue' ? 'blue' : 'red';
 
     const startX = (col + next[1] + 0.5) * cellSize;
@@ -182,19 +180,22 @@ function isBoardFull() {
     return board.every(row => row.every(cell => cell !== ''));
 }
 
-function endGame() {
+function endGame(winner = null) {
     gameOver = true;
     let winnerText;
 
     if (gameMode === 'simple') {
-        winnerText = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)} wins!`;
+        winnerText = winner === 'draw' ? "It's a draw!" : `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!`;
     } else {
-        winnerText = blueScore > redScore
-            ? 'Blue wins!'
-            : redScore > blueScore
-            ? 'Red wins!'
-            : 'It\'s a draw!';
+        if (blueScore > redScore) {
+            winnerText = 'Blue wins!';
+        } else if (redScore > blueScore) {
+            winnerText = 'Red wins!';
+        } else {
+            winnerText = "It's a draw!";
+        }
     }
+
     document.getElementById('winnerDisplay').textContent = winnerText;
 }
 
@@ -218,17 +219,4 @@ function makeComputerMove() {
     if (availableMoves.length > 0) {
         const [row, col] = availableMoves[Math.floor(Math.random() * availableMoves.length)];
         const piece = currentPlayer === 'blue'
-            ? document.querySelector('input[name="bluePiece"]:checked').value
-            : document.querySelector('input[name="redPiece"]:checked').value;
-
-        board[row][col] = piece;
-        drawBoard();
-
-        const sosFormed = checkForSOS(row, col);
-        if (!sosFormed) {
-            switchPlayer();
-        }
-    }
-}
-
-window.onload = startNewGame;
+            ? document.querySelector('input[name
