@@ -48,8 +48,8 @@ function setupCanvas() {
     canvas.width = table.clientWidth;
     canvas.height = table.clientHeight;
     canvas.style.position = 'absolute';
-    canvas.style.top = `${table.offsetTop}px`;
-    canvas.style.left = `${table.offsetLeft}px`;
+    canvas.style.top = '0px';
+    canvas.style.left = '0px';
     ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -81,24 +81,28 @@ function handleCellClick(event) {
 
     const sosFormed = checkForSOS(row, col);
 
-    if (gameMode === 'simple') {
-        if (sosFormed) {
-            endGame(currentPlayer);
-        } else if (isBoardFull()) {
-            endGame(null); // Draw if no SOS and board is full
-        } else {
-            switchPlayer();
-        }
-    } else if (gameMode === 'general') {
-        if (sosFormed) {
-            // Player gets another turn if they form an SOS
-            updateScore();
-        } else {
-            switchPlayer();
-        }
+    if (sosFormed) {
+        updateScore();
 
+        if (gameMode === 'simple') {
+            endGame(currentPlayer);
+            return; // Game ends immediately when SOS is formed
+        }
+    }
+
+    if (gameMode === 'general' && sosFormed) {
+        // Player gets another turn
         if (isBoardFull()) {
-            endGame(getWinnerByScore()); // End game and check scores
+            endGame(getWinnerByScore());
+        }
+        // Do not switch player, allow the current player to move again
+    } else {
+        // Switch player if no SOS formed or in simple game after a non-winning move
+        switchPlayer();
+        if (gameMode === 'general' && isBoardFull()) {
+            endGame(getWinnerByScore());
+        } else if (gameMode === 'simple' && isBoardFull()) {
+            endGame(null); // Draw if the board is full and no SOS formed
         }
     }
 
@@ -113,60 +117,52 @@ function switchPlayer() {
 
 function checkForSOS(row, col) {
     const piece = board[row][col];
-    const sosSequences = [
-        [[0, -2], [0, -1], [0, 1], [0, 2]], // Horizontal
-        [[-2, 0], [-1, 0], [1, 0], [2, 0]], // Vertical
-        [[-2, -2], [-1, -1], [1, 1], [2, 2]], // Diagonal \
-        [[-2, 2], [-1, 1], [1, -1], [2, -2]] // Diagonal /
-    ];
-
-    let sosFound = false;
-
-    sosSequences.forEach(direction => {
-        const [prev, current, next] = direction;
-        if (isSOS(row, col, prev, current, next)) {
-            sosFound = true;
-            drawSOSLine(row, col, prev, current, next);
-            updateScore();
-        }
-    });
-
+    const sosFound = findAndMarkSOS(row, col);
     return sosFound;
 }
 
-function isSOS(row, col, prev, current, next) {
-    const prevRow = row + prev[0];
-    const prevCol = col + prev[1];
-    const currentRow = row + current[0];
-    const currentCol = col + current[1];
-    const nextRow = row + next[0];
-    const nextCol = col + next[1];
+function findAndMarkSOS(row, col) {
+    const directions = [
+        { dr: 0, dc: 1 },  // Horizontal right
+        { dr: 1, dc: 0 },  // Vertical down
+        { dr: 1, dc: 1 },  // Diagonal down-right
+        { dr: 1, dc: -1 }, // Diagonal down-left
+        { dr: 0, dc: -1 }, // Horizontal left
+        { dr: -1, dc: 0 }, // Vertical up
+        { dr: -1, dc: -1 },// Diagonal up-left
+        { dr: -1, dc: 1 }  // Diagonal up-right
+    ];
 
-    if (
-        prevRow >= 0 && prevRow < boardSize &&
-        prevCol >= 0 && prevCol < boardSize &&
-        currentRow >= 0 && currentRow < boardSize &&
-        currentCol >= 0 && currentCol < boardSize &&
-        nextRow >= 0 && nextRow < boardSize &&
-        nextCol >= 0 && nextCol < boardSize
-    ) {
-        return board[prevRow][prevCol] === 'S' &&
-               board[currentRow][currentCol] === 'O' &&
-               board[nextRow][nextCol] === 'S';
+    let sosFormed = false;
+
+    for (const dir of directions) {
+        const positions = [
+            { r: row - dir.dr, c: col - dir.dc },
+            { r: row, c: col },
+            { r: row + dir.dr, c: col + dir.dc }
+        ];
+
+        if (positions.every(pos => pos.r >= 0 && pos.r < boardSize && pos.c >= 0 && pos.c < boardSize)) {
+            const [first, second, third] = positions.map(pos => board[pos.r][pos.c]);
+            if (first === 'S' && second === 'O' && third === 'S') {
+                drawLine(positions[0], positions[2]);
+                sosFormed = true;
+            }
+        }
     }
 
-    return false;
+    return sosFormed;
 }
 
-function drawSOSLine(row, col, prev, current, next) {
+function drawLine(startPos, endPos) {
     const table = document.querySelector('table');
     const cellSize = table.rows[0].cells[0].offsetWidth;
     const color = currentPlayer === 'blue' ? 'blue' : 'red';
 
-    const startX = (col + next[1] + 0.5) * cellSize;
-    const startY = (row + next[0] + 0.5) * cellSize;
-    const endX = (col + prev[1] + 0.5) * cellSize;
-    const endY = (row + prev[0] + 0.5) * cellSize;
+    const startX = (startPos.c + 0.5) * cellSize;
+    const startY = (startPos.r + 0.5) * cellSize;
+    const endX = (endPos.c + 0.5) * cellSize;
+    const endY = (endPos.r + 0.5) * cellSize;
 
     ctx.strokeStyle = color;
     ctx.lineWidth = 5;
@@ -193,7 +189,7 @@ function endGame(winner) {
     let winnerText;
 
     if (gameMode === 'simple') {
-        winnerText = winner ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!` : 'It\'s a draw!';
+        winnerText = winner ? `${capitalize(winner)} wins!` : 'It\'s a draw!';
     } else if (gameMode === 'general') {
         winnerText = blueScore > redScore
             ? 'Blue wins!'
@@ -208,6 +204,10 @@ function getWinnerByScore() {
     return blueScore > redScore ? 'blue' : redScore > blueScore ? 'red' : null;
 }
 
+function capitalize(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 function isComputerTurn() {
     const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
     const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
@@ -216,6 +216,8 @@ function isComputerTurn() {
 }
 
 function makeComputerMove() {
+    if (gameOver) return;
+
     let availableMoves = [];
     for (let i = 0; i < boardSize; i++) {
         for (let j = 0; j < boardSize; j++) {
@@ -235,8 +237,30 @@ function makeComputerMove() {
         drawBoard();
 
         const sosFormed = checkForSOS(row, col);
-        if (!sosFormed) {
+
+        if (sosFormed) {
+            updateScore();
+
+            if (gameMode === 'simple') {
+                endGame(currentPlayer);
+                return; // Game ends immediately when SOS is formed
+            }
+        }
+
+        if (gameMode === 'general' && sosFormed) {
+            // Computer gets another turn
+            if (isBoardFull()) {
+                endGame(getWinnerByScore());
+            } else {
+                setTimeout(makeComputerMove, 500);
+            }
+        } else {
             switchPlayer();
+            if (gameMode === 'general' && isBoardFull()) {
+                endGame(getWinnerByScore());
+            } else if (gameMode === 'simple' && isBoardFull()) {
+                endGame(null); // Draw if the board is full and no SOS formed
+            }
         }
     }
 }
