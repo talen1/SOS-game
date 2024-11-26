@@ -87,21 +87,21 @@ function handleCellClick(event) {
 
     if (gameMode === 'simple') {
         if (sosFormed) {
-            endGame(currentPlayer); // Immediately end the game if an SOS is formed
+            endGame(currentPlayer); // Declare winner immediately on SOS
         } else if (isBoardFull()) {
-            endGame(null); // Declare a draw if no SOS and the board is full
+            endGame(null); // Declare draw if board is full and no SOS
         } else {
             switchPlayer();
         }
     } else if (gameMode === 'general') {
         if (sosFormed) {
-            updateScore();
+            updateScore(); // Score is updated in checkForSOS
         } else {
             switchPlayer();
         }
 
         if (isBoardFull()) {
-            endGame(getWinnerByScore()); // End game and check scores
+            endGame(getWinnerByScore()); // Declare winner based on score
         }
     }
 
@@ -195,7 +195,9 @@ function endGame(winner) {
     let winnerText;
 
     if (gameMode === 'simple') {
-        winnerText = winner ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!` : 'It\'s a draw!';
+        winnerText = winner 
+            ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!` 
+            : 'It\'s a draw!';
     } else if (gameMode === 'general') {
         winnerText = blueScore > redScore
             ? 'Blue wins!'
@@ -203,11 +205,12 @@ function endGame(winner) {
             ? 'Red wins!'
             : 'It\'s a draw!';
     }
+
     document.getElementById('winnerDisplay').textContent = winnerText;
 }
 
 function getWinnerByScore() {
-    return blueScore > redScore ? 'blue' : redScore > blueScore ? 'red' : null;
+    return blueScore > redScore ? 'blue' : redScore > blueScore ? 'red' : null; // Determine winner by score
 }
 
 function isComputerTurn() {
