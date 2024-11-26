@@ -27,7 +27,6 @@ function startNewGame() {
     setupCanvas();
     drawBoard();
 
-    // Automatically start computer vs. computer game
     if (isBothPlayersComputer()) {
         setTimeout(playComputerVsComputer, 500);
     }
@@ -117,7 +116,6 @@ function handleCellClick(event) {
         }
     }
 
-    // Trigger computer turn if applicable
     if (!gameOver && isComputerTurn()) {
         setTimeout(makeComputerMove, 500);
     }
@@ -181,7 +179,6 @@ function switchPlayer() {
     currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
     document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
 
-    // Trigger computer turn if needed
     if (isComputerTurn() && !gameOver) {
         setTimeout(makeComputerMove, 500);
     }
@@ -209,8 +206,73 @@ function playComputerVsComputer() {
     }
 }
 
+function importGame() {
+    const fileInput = document.getElementById('importGame');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert('Please select a file to import.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const gameData = JSON.parse(e.target.result);
+
+            if (!validateGameData(gameData)) {
+                alert('Invalid game file format.');
+                return;
+            }
+
+            boardSize = gameData.boardSize;
+            gameMode = gameData.gameMode;
+            blueScore = gameData.blueScore || 0;
+            redScore = gameData.redScore || 0;
+            board = Array(boardSize).fill().map(() => Array(boardSize).fill(''));
+            currentPlayer = 'blue';
+            gameOver = false;
+
+            setupCanvas();
+            drawBoard();
+
+            replayMoves(gameData.moves);
+
+        } catch (error) {
+            console.error('Error importing game:', error);
+            alert('Failed to import game.');
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+function validateGameData(gameData) {
+    return gameData &&
+        typeof gameData.boardSize === 'number' &&
+        Array.isArray(gameData.moves) &&
+        typeof gameData.gameMode === 'string' &&
+        (gameData.gameMode === 'simple' || gameData.gameMode === 'general');
+}
+
+function replayMoves(moves) {
+    for (let i = 0; i < moves.length; i++) {
+        const move = moves[i];
+        const { player, row, col, piece } = move;
+
+        board[row][col] = piece;
+
+        drawBoard();
+
+        if (i < moves.length - 1) {
+            setTimeout(() => {}, 500);
+        }
+    }
+
+    document.getElementById('currentTurn').textContent = `Game Imported: ${gameMode.toUpperCase()} Mode`;
+}
+
 function checkForSOS(row, col) {
-    // Logic to check if SOS was formed
     return false; // Placeholder logic
 }
 
@@ -235,10 +297,10 @@ function endGame(winner) {
         gameHistory.push({
             type: 'end',
             winner: winner,
-            boardState: board.map(row => [...row]), // Deep copy of the board
+            boardState: board.map(row => [...row]),
             mode: gameMode
         });
-        document.getElementById('saveGameButton').disabled = false; // Enable save button
+        document.getElementById('saveGameButton').disabled = false;
     }
 }
 
