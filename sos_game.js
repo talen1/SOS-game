@@ -24,10 +24,6 @@ function startNewGame() {
 
     setupCanvas();
     drawBoard();
-
-    if (isBothPlayersComputer()) {
-        setTimeout(playComputerVsComputer, 500);
-    }
 }
 
 function setupCanvas() {
@@ -97,72 +93,33 @@ function handleCellClick(event) {
             endGame(currentPlayer);
         } else if (isBoardFull()) {
             endGame(null);
-        } else {
-            switchPlayer();
+        } else if (!isComputerTurn()) {
+            switchPlayerManual();
         }
     } else if (gameMode === 'general') {
         if (sosFormed) {
             updateScore();
-        } else {
-            switchPlayer();
+        } else if (!isComputerTurn()) {
+            switchPlayerManual();
         }
 
         if (isBoardFull()) {
             endGame(getWinnerByScore());
         }
     }
-
-    if (!gameOver && isComputerTurn()) {
-        setTimeout(makeComputerMove, 500);
-    }
 }
 
-function makeComputerMove() {
-    let availableMoves = [];
-    for (let i = 0; i < boardSize; i++) {
-        for (let j = 0; j < boardSize; j++) {
-            if (board[i][j] === '') {
-                availableMoves.push([i, j]);
-            }
-        }
+function switchPlayerManual() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+
+    if (gameOver) return;
+
+    if ((currentPlayer === 'blue' && bluePlayerType === 'human') ||
+        (currentPlayer === 'red' && redPlayerType === 'human')) {
+        currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
+        document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
     }
-
-    if (availableMoves.length > 0) {
-        const [row, col] = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-        const piece = currentPlayer === 'blue'
-            ? document.querySelector('input[name="bluePiece"]:checked').value
-            : document.querySelector('input[name="redPiece"]:checked').value;
-
-        board[row][col] = piece;
-        if (isRecording) gameHistory.push({ row, col, piece, player: currentPlayer });
-        drawBoard();
-
-        const sosFormed = checkForSOS(row, col);
-
-        if (gameMode === 'simple' && sosFormed) {
-            endGame(currentPlayer);
-            return;
-        }
-
-        if (gameMode === 'general') {
-            if (sosFormed) {
-                updateScore();
-            } else {
-                switchPlayer();
-            }
-        } else {
-            switchPlayer();
-        }
-
-        if (!gameOver && isComputerTurn()) {
-            setTimeout(makeComputerMove, 500);
-        }
-    }
-}
-
-function switchPlayer() {
-    currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
-    document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
 }
 
 function updateScore() {
@@ -219,49 +176,11 @@ function saveGameHistory() {
     link.click();
 }
 
-function replayGame(file) {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-        const gameData = JSON.parse(event.target.result);
-        boardSize = gameData.boardSize;
-        gameMode = gameData.gameMode;
-        blueScore = gameData.blueScore;
-        redScore = gameData.redScore;
-        gameHistory = gameData.gameHistory;
-
-        startNewGame();
-        gameHistory.forEach((move, index) => {
-            setTimeout(() => {
-                board[move.row][move.col] = move.piece;
-                drawBoard();
-            }, index * 500);
-        });
-
-        setTimeout(() => {
-            document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
-            document.getElementById('winnerDisplay').textContent = gameData.winner;
-        }, gameHistory.length * 500);
-    };
-    reader.readAsText(file);
-}
-
-function isBothPlayersComputer() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return bluePlayerType === 'computer' && redPlayerType === 'computer';
-}
-
 function isComputerTurn() {
     const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
     const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
     return (currentPlayer === 'blue' && bluePlayerType === 'computer') || 
            (currentPlayer === 'red' && redPlayerType === 'computer');
-}
-
-function playComputerVsComputer() {
-    if (!gameOver) {
-        makeComputerMove();
-    }
 }
 
 window.onload = startNewGame;
