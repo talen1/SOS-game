@@ -24,6 +24,11 @@ function startNewGame() {
 
     setupCanvas();
     drawBoard();
+
+    // If both players are computers, start autoplay
+    if (isBothPlayersComputer()) {
+        setTimeout(playComputerVsComputer, 500);
+    }
 }
 
 function setupCanvas() {
@@ -71,7 +76,7 @@ function drawBoard() {
 }
 
 function handleCellClick(event) {
-    if (gameOver) return;
+    if (gameOver || isComputerTurn()) return;
 
     const row = parseInt(event.target.dataset.row);
     const col = parseInt(event.target.dataset.col);
@@ -93,33 +98,89 @@ function handleCellClick(event) {
             endGame(currentPlayer);
         } else if (isBoardFull()) {
             endGame(null);
-        } else if (!isComputerTurn()) {
-            switchPlayerManual();
+        } else {
+            switchPlayer();
         }
     } else if (gameMode === 'general') {
         if (sosFormed) {
             updateScore();
-        } else if (!isComputerTurn()) {
-            switchPlayerManual();
+        } else {
+            switchPlayer();
         }
 
         if (isBoardFull()) {
             endGame(getWinnerByScore());
         }
     }
+
+    if (!gameOver && isComputerTurn()) {
+        setTimeout(makeComputerMove, 500);
+    }
 }
 
-function switchPlayerManual() {
+function makeComputerMove() {
+    let availableMoves = [];
+    for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+            if (board[i][j] === '') {
+                availableMoves.push([i, j]);
+            }
+        }
+    }
+
+    if (availableMoves.length > 0) {
+        const [row, col] = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        const piece = currentPlayer === 'blue'
+            ? document.querySelector('input[name="bluePiece"]:checked').value
+            : document.querySelector('input[name="redPiece"]:checked').value;
+
+        board[row][col] = piece;
+        if (isRecording) gameHistory.push({ row, col, piece, player: currentPlayer });
+        drawBoard();
+
+        const sosFormed = checkForSOS(row, col);
+
+        if (gameMode === 'simple' && sosFormed) {
+            endGame(currentPlayer);
+            return;
+        }
+
+        if (gameMode === 'general') {
+            if (sosFormed) {
+                updateScore();
+            } else {
+                switchPlayer();
+            }
+        }
+
+        if (!gameOver && isComputerTurn()) {
+            setTimeout(makeComputerMove, 500);
+        }
+    }
+}
+
+function playComputerVsComputer() {
+    if (!gameOver) {
+        makeComputerMove();
+    }
+}
+
+function switchPlayer() {
+    currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
+    document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
+}
+
+function isComputerTurn() {
     const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
     const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return (currentPlayer === 'blue' && bluePlayerType === 'computer') || 
+           (currentPlayer === 'red' && redPlayerType === 'computer');
+}
 
-    if (gameOver) return;
-
-    if ((currentPlayer === 'blue' && bluePlayerType === 'human') ||
-        (currentPlayer === 'red' && redPlayerType === 'human')) {
-        currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
-        document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
-    }
+function isBothPlayersComputer() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return bluePlayerType === 'computer' && redPlayerType === 'computer';
 }
 
 function updateScore() {
@@ -129,16 +190,6 @@ function updateScore() {
         redScore++;
     }
     document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
-}
-
-function isBoardFull() {
-    return board.every(row => row.every(cell => cell !== ''));
-}
-
-function getWinnerByScore() {
-    if (blueScore > redScore) return 'blue';
-    if (redScore > blueScore) return 'red';
-    return null;
 }
 
 function endGame(winner) {
@@ -176,11 +227,30 @@ function saveGameHistory() {
     link.click();
 }
 
-function isComputerTurn() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return (currentPlayer === 'blue' && bluePlayerType === 'computer') || 
-           (currentPlayer === 'red' && redPlayerType === 'computer');
+function replayGame(file) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const gameData = JSON.parse(event.target.result);
+        boardSize = gameData.boardSize;
+        gameMode = gameData.gameMode;
+        blueScore = gameData.blueScore;
+        redScore = gameData.redScore;
+        gameHistory = gameData.gameHistory;
+
+        startNewGame();
+        gameHistory.forEach((move, index) => {
+            setTimeout(() => {
+                board[move.row][move.col] = move.piece;
+                drawBoard();
+            }, index * 500);
+        });
+
+        setTimeout(() => {
+            document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
+            document.getElementById('winnerDisplay').textContent = gameData.winner;
+        }, gameHistory.length * 500);
+    };
+    reader.readAsText(file);
 }
 
 window.onload = startNewGame;
