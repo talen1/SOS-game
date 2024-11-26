@@ -20,51 +20,53 @@
         canvas {
             pointer-events: none;
         }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #winnerDisplay {
+            font-size: 20px;
+            color: green;
+            margin-top: 10px;
+        }
+        #currentTurn {
+            font-size: 16px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">SOS Game</h1>
-    <div style="text-align: center;">
+    <h1>SOS Game</h1>
+    <div>
         <label for="boardSize">Board size:</label>
         <input type="number" id="boardSize" value="8" min="3">
-        <br><br>
+    </div>
+    <div>
         <label>Select Game Mode:</label>
         <input type="radio" name="gameMode" value="simple" checked> Simple Game
         <input type="radio" name="gameMode" value="general"> General Game
-        <br><br>
-        <button onclick="startNewGame()">New Game</button>
-        <br><br>
-        <div>
-            <strong>Blue Player</strong><br>
-            <input type="radio" name="bluePlayerType" value="human" checked> Human
-            <input type="radio" name="bluePlayerType" value="computer"> Computer
-            <br>
-            <input type="radio" name="bluePiece" value="S" checked> S
-            <input type="radio" name="bluePiece" value="O"> O
-        </div>
-        <br>
-        <div>
-            <strong>Red Player</strong><br>
-            <input type="radio" name="redPlayerType" value="human" checked> Human
-            <input type="radio" name="redPlayerType" value="computer"> Computer
-            <br>
-            <input type="radio" name="redPiece" value="S" checked> S
-            <input type="radio" name="redPiece" value="O"> O
-        </div>
-        <br>
-        <div>
-            <input type="checkbox" id="recordGame"> Record game
-        </div>
-        <br>
-        <div>
-            <label for="importFile">Import Game:</label>
-            <input type="file" id="importFile" accept=".json" onchange="replayGame(this.files[0])">
-        </div>
-        <br>
-        <div id="winnerDisplay" style="font-size: 20px; color: green;"></div>
-        <div id="currentTurn" style="font-size: 16px;"></div>
-        <div id="gameBoard"></div>
     </div>
+    <button onclick="startNewGame()">New Game</button>
+    <br><br>
+    <div>
+        <strong>Blue Player</strong><br>
+        <input type="radio" name="bluePlayerType" value="human" checked> Human
+        <input type="radio" name="bluePlayerType" value="computer"> Computer
+        <br>
+        <input type="radio" name="bluePiece" value="S" checked> S
+        <input type="radio" name="bluePiece" value="O"> O
+    </div>
+    <div>
+        <strong>Red Player</strong><br>
+        <input type="radio" name="redPlayerType" value="human" checked> Human
+        <input type="radio" name="redPlayerType" value="computer"> Computer
+        <br>
+        <input type="radio" name="redPiece" value="S" checked> S
+        <input type="radio" name="redPiece" value="O"> O
+    </div>
+    <div id="gameBoard"></div>
+    <div id="winnerDisplay"></div>
+    <div id="currentTurn"></div>
+    <script src="sos_game.js"></script>
 </body>
-<script src="sos_game.js"></script>
 </html>
