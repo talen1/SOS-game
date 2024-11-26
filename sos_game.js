@@ -6,8 +6,6 @@ let blueScore = 0;
 let redScore = 0;
 let gameMode = 'simple';
 let ctx;
-let gameHistory = [];
-let isRecording = false;
 
 function startNewGame() {
     boardSize = parseInt(document.getElementById('boardSize').value);
@@ -16,16 +14,13 @@ function startNewGame() {
     gameOver = false;
     blueScore = 0;
     redScore = 0;
-    gameMode = document.querySelector('input[name="gameMode"]:checked').value;
-    isRecording = document.getElementById('recordGame').checked;
-    gameHistory = [];
     document.getElementById('winnerDisplay').textContent = '';
     document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
 
     setupCanvas();
     drawBoard();
 
-    // If both players are computers, start autoplay
+    // Trigger autoplay if both players are computers
     if (isBothPlayersComputer()) {
         setTimeout(playComputerVsComputer, 500);
     }
@@ -88,7 +83,6 @@ function handleCellClick(event) {
         : document.querySelector('input[name="redPiece"]:checked').value;
 
     board[row][col] = piece;
-    if (isRecording) gameHistory.push({ row, col, piece, player: currentPlayer });
     drawBoard();
 
     const sosFormed = checkForSOS(row, col);
@@ -112,6 +106,10 @@ function handleCellClick(event) {
             endGame(getWinnerByScore());
         }
     }
+
+    if (!gameOver && isComputerTurn()) {
+        setTimeout(makeComputerMove, 500);
+    }
 }
 
 function makeComputerMove() {
@@ -130,10 +128,9 @@ function makeComputerMove() {
         const [row, col] = availableMoves[Math.floor(Math.random() * availableMoves.length)];
         const piece = currentPlayer === 'blue'
             ? document.querySelector('input[name="bluePiece"]:checked').value
-            : document.querySelector('input[name="redPiece"]:checked').value;
+            : document.querySelector('input[name="redPiece"]:checked").value;
 
         board[row][col] = piece;
-        if (isRecording) gameHistory.push({ row, col, piece, player: currentPlayer });
         drawBoard();
 
         const sosFormed = checkForSOS(row, col);
@@ -167,8 +164,6 @@ function playComputerVsComputer() {
 function switchPlayer() {
     currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
     document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
-
-    // Trigger the computer move if it's the computer's turn
     if (isComputerTurn() && !gameOver) {
         setTimeout(makeComputerMove, 500);
     }
@@ -198,63 +193,14 @@ function updateScore() {
 
 function endGame(winner) {
     gameOver = true;
-    let winnerText = '';
-
-    if (gameMode === 'simple') {
-        winnerText = winner
-            ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!`
-            : 'It\'s a draw!';
-    } else if (gameMode === 'general') {
-        winnerText = winner
-            ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!`
-            : 'It\'s a draw!';
-    }
-
+    const winnerText = winner
+        ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!`
+        : 'It\'s a draw!';
     document.getElementById('winnerDisplay').textContent = winnerText;
-
-    if (isRecording) saveGameHistory();
 }
 
-function saveGameHistory() {
-    const gameData = {
-        boardSize,
-        gameMode,
-        blueScore,
-        redScore,
-        gameHistory,
-        winner: document.getElementById('winnerDisplay').textContent
-    };
-    const blob = new Blob([JSON.stringify(gameData, null, 2)], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'sos_game_record.json';
-    link.click();
-}
-
-function replayGame(file) {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-        const gameData = JSON.parse(event.target.result);
-        boardSize = gameData.boardSize;
-        gameMode = gameData.gameMode;
-        blueScore = gameData.blueScore;
-        redScore = gameData.redScore;
-        gameHistory = gameData.gameHistory;
-
-        startNewGame();
-        gameHistory.forEach((move, index) => {
-            setTimeout(() => {
-                board[move.row][move.col] = move.piece;
-                drawBoard();
-            }, index * 500);
-        });
-
-        setTimeout(() => {
-            document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
-            document.getElementById('winnerDisplay').textContent = gameData.winner;
-        }, gameHistory.length * 500);
-    };
-    reader.readAsText(file);
+function isBoardFull() {
+    return board.every(row => row.every(cell => cell !== ''));
 }
 
 window.onload = startNewGame;
