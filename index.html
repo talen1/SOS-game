@@ -19,19 +19,12 @@
         }
         canvas {
             pointer-events: none;
+            position: absolute;
         }
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        #winnerDisplay {
-            font-size: 20px;
-            color: green;
-            margin-top: 10px;
-        }
-        #currentTurn {
-            font-size: 16px;
-            margin-top: 10px;
+        #gameContainer {
+            position: relative;
+            width: max-content;
+            margin: 20px auto;
         }
     </style>
 </head>
@@ -64,9 +57,12 @@
         <input type="radio" name="redPiece" value="S" checked> S
         <input type="radio" name="redPiece" value="O"> O
     </div>
-    <div id="gameBoard"></div>
-    <div id="winnerDisplay"></div>
-    <div id="currentTurn"></div>
+    <div id="gameContainer">
+        <div id="gameBoard"></div>
+        <canvas id="sosCanvas"></canvas>
+    </div>
+    <div id="winnerDisplay" style="font-size: 20px; color: green; margin-top: 10px;"></div>
+    <div id="currentTurn" style="font-size: 16px; margin-top: 10px;"></div>
     <script src="sos_game.js"></script>
 </body>
 </html>
