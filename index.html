@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOS Game</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-        }
         table {
             border-collapse: collapse;
             margin: 20px auto;
@@ -76,6 +71,11 @@
         <div>
             <button onclick="startNewGame()">New Game</button>
             <button id="saveGameButton" onclick="saveRecordedGame()" disabled>Save Game</button>
+        </div>
+        <div>
+            <label for="importGame">Import game:</label>
+            <input type="file" id="importGame" accept=".json">
+            <button onclick="importGame()">Load Game</button>
         </div>
     </div>
     <div id="gameBoard"></div>
