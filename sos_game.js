@@ -103,10 +103,6 @@ function handleCellClick(event) {
     } else if (gameMode === 'general') {
         if (sosFormed) {
             updateScore();
-            if (isComputerTurn() && !gameOver) {
-                setTimeout(makeComputerMove, 500);
-                return;
-            }
         } else {
             switchPlayer();
         }
@@ -155,11 +151,14 @@ function makeComputerMove() {
                     setTimeout(makeComputerMove, 500);
                     return;
                 }
+            } else {
+                switchPlayer();
             }
+        } else {
+            switchPlayer();
         }
 
-        switchPlayer();
-        if (isComputerTurn() && !gameOver) {
+        if (!gameOver && isComputerTurn()) {
             setTimeout(makeComputerMove, 500);
         }
     }
