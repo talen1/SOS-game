@@ -26,6 +26,11 @@ function startNewGame() {
 
     setupCanvas();
     drawBoard();
+
+    // Automatically start computer vs. computer game
+    if (isBothPlayersComputer()) {
+        setTimeout(playComputerVsComputer, 500);
+    }
 }
 
 function setupCanvas() {
@@ -174,18 +179,26 @@ function makeComputerMove() {
     }
 }
 
-function checkForSOS(row, col) {
-    // Logic to check if SOS was formed
-    return false; // Placeholder logic
+function isBothPlayersComputer() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return bluePlayerType === 'computer' && redPlayerType === 'computer';
 }
 
-function updateScore() {
-    if (currentPlayer === 'blue') {
-        blueScore++;
-    } else {
-        redScore++;
+function playComputerVsComputer() {
+    if (!gameOver) {
+        makeComputerMove(); // Current player takes its turn
+        if (!gameOver) {
+            setTimeout(playComputerVsComputer, 500); // Continue loop
+        }
     }
-    document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
+}
+
+function isComputerTurn() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return (currentPlayer === 'blue' && bluePlayerType === 'computer') ||
+           (currentPlayer === 'red' && redPlayerType === 'computer');
 }
 
 function switchPlayer() {
@@ -219,13 +232,6 @@ function endGame(winner) {
 
 function isBoardFull() {
     return board.every(row => row.every(cell => cell !== ''));
-}
-
-function isComputerTurn() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return (currentPlayer === 'blue' && bluePlayerType === 'computer') ||
-           (currentPlayer === 'red' && redPlayerType === 'computer');
 }
 
 function saveRecordedGame() {
