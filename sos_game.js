@@ -142,6 +142,30 @@ function checkForSOS(row, col) {
     return sosFound;
 }
 
+function isSOS(row, col, prev, current, next) {
+    const prevRow = row + prev[0];
+    const prevCol = col + prev[1];
+    const currentRow = row + current[0];
+    const currentCol = col + current[1];
+    const nextRow = row + next[0];
+    const nextCol = col + next[1];
+
+    if (
+        prevRow >= 0 && prevRow < boardSize &&
+        prevCol >= 0 && prevCol < boardSize &&
+        currentRow >= 0 && currentRow < boardSize &&
+        currentCol >= 0 && currentCol < boardSize &&
+        nextRow >= 0 && nextRow < boardSize &&
+        nextCol >= 0 && nextCol < boardSize
+    ) {
+        return board[prevRow][prevCol] === 'S' &&
+               board[currentRow][currentCol] === 'O' &&
+               board[nextRow][nextCol] === 'S';
+    }
+
+    return false;
+}
+
 function endGame(winner) {
     gameOver = true;
     let winnerText;
@@ -230,12 +254,16 @@ function makeComputerMove() {
         drawBoard();
 
         const sosFormed = checkForSOS(row, col);
-        if (!sosFormed) {
-            switchPlayer();
+        if (gameMode === 'simple' && sosFormed) {
+            endGame(currentPlayer);
+            return; // Stop further moves
         }
 
-        if (isBothPlayersComputer() && !gameOver) {
-            setTimeout(makeComputerMove, 500); // Continue if both players are computers
+        if (!gameOver) {
+            switchPlayer();
+            if (isComputerTurn()) {
+                setTimeout(makeComputerMove, 500);
+            }
         }
     }
 }
