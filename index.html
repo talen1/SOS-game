@@ -4,10 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOS Game</title>
-     <style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        #gameContainer {
+            display: inline-block;
+            position: relative;
+            margin: 20px auto;
+        }
         table {
             border-collapse: collapse;
-            margin: 20px auto;
+            margin: auto;
         }
         td {
             width: 40px;
@@ -19,52 +30,52 @@
         }
         canvas {
             pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #winnerDisplay, #currentTurn {
+            margin-top: 10px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">SOS Game</h1>
-    <div style="text-align: center;">
+    <h1>SOS Game</h1>
+    <div>
         <label for="boardSize">Board size:</label>
         <input type="number" id="boardSize" value="8" min="3">
-        <br><br>
+    </div>
+    <div>
         <label>Select Game Mode:</label>
         <input type="radio" name="gameMode" value="simple" checked> Simple Game
         <input type="radio" name="gameMode" value="general"> General Game
-        <br><br>
-        <button onclick="startNewGame()">New Game</button>
-        <br><br>
-        <div>
-            <strong>Blue Player</strong><br>
-            <input type="radio" name="bluePlayerType" value="human" checked> Human
-            <input type="radio" name="bluePlayerType" value="computer"> Computer
-            <br>
-            <input type="radio" name="bluePiece" value="S" checked> S
-            <input type="radio" name="bluePiece" value="O"> O
-        </div>
-        <br>
-         <div>
-            <strong>Red Player</strong><br>
-            <input type="radio" name="redPlayerType" value="human" checked> Human
-            <input type="radio" name="redPlayerType" value="computer"> Computer
-            <br>
-            <input type="radio" name="redPiece" value="S" checked> S
-            <input type="radio" name="redPiece" value="O"> O
-        </div>
-        <br>
-         <div>
-            <input type="checkbox" id="recordGame"> Record game
-        </div>
-        <br>
-        <div>
-            <label for="replayFile">Replay Game:</label>
-            <input type="file" id="replayFile" onchange="replayGame(this.files[0])">
-        </div>
-        <br>
-         <div id="winnerDisplay" style="font-size: 20px; color: green;"></div>
-        <div id="currentTurn" style="font-size: 16px;"></div>
-        <div id="gameBoard"></div>
     </div>
-    </body>
-<script src="sos_game.js"></script>
+    <button onclick="startNewGame()">New Game</button>
+    <br><br>
+    <div>
+        <strong>Blue Player</strong><br>
+        <input type="radio" name="bluePlayerType" value="human" checked> Human
+        <input type="radio" name="bluePlayerType" value="computer"> Computer
+        <br>
+        <input type="radio" name="bluePiece" value="S" checked> S
+        <input type="radio" name="bluePiece" value="O"> O
+    </div>
+    <div>
+        <strong>Red Player</strong><br>
+        <input type="radio" name="redPlayerType" value="human" checked> Human
+        <input type="radio" name="redPlayerType" value="computer"> Computer
+        <br>
+        <input type="radio" name="redPiece" value="S" checked> S
+        <input type="radio" name="redPiece" value="O"> O
+    </div>
+    <br>
+    <div id="gameContainer">
+        <div id="gameBoard"></div>
+        <canvas id="sosCanvas"></canvas>
+    </div>
+    <div id="winnerDisplay"></div>
+    <div id="currentTurn"></div>
+    <script src="sos_game.js"></script>
+</body>
 </html>
