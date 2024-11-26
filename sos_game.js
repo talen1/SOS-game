@@ -167,38 +167,14 @@ function makeComputerMove() {
             }
         }
 
-        // Switch players if no SOS was formed
         if (!gameOver && !sosFormed) {
             switchPlayer();
         }
 
-        // Trigger next computer move if needed
         if (!gameOver && isComputerTurn()) {
             setTimeout(makeComputerMove, 500);
         }
     }
-}
-
-function isBothPlayersComputer() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return bluePlayerType === 'computer' && redPlayerType === 'computer';
-}
-
-function playComputerVsComputer() {
-    if (!gameOver) {
-        makeComputerMove(); // Current player takes its turn
-        if (!gameOver) {
-            setTimeout(playComputerVsComputer, 500); // Continue loop
-        }
-    }
-}
-
-function isComputerTurn() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return (currentPlayer === 'blue' && bluePlayerType === 'computer') ||
-           (currentPlayer === 'red' && redPlayerType === 'computer');
 }
 
 function switchPlayer() {
@@ -209,6 +185,42 @@ function switchPlayer() {
     if (isComputerTurn() && !gameOver) {
         setTimeout(makeComputerMove, 500);
     }
+}
+
+function isComputerTurn() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return (currentPlayer === 'blue' && bluePlayerType === 'computer') ||
+           (currentPlayer === 'red' && redPlayerType === 'computer');
+}
+
+function isBothPlayersComputer() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return bluePlayerType === 'computer' && redPlayerType === 'computer';
+}
+
+function playComputerVsComputer() {
+    if (!gameOver) {
+        makeComputerMove();
+        if (!gameOver) {
+            setTimeout(playComputerVsComputer, 500);
+        }
+    }
+}
+
+function checkForSOS(row, col) {
+    // Logic to check if SOS was formed
+    return false; // Placeholder logic
+}
+
+function updateScore() {
+    if (currentPlayer === 'blue') {
+        blueScore++;
+    } else {
+        redScore++;
+    }
+    document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
 }
 
 function endGame(winner) {
