@@ -60,6 +60,11 @@
             <button onclick="switchPlayerManual()">Switch Player</button>
         </div>
         <br>
+        <div>
+            <label for="importFile">Import Game:</label>
+            <input type="file" id="importFile" accept=".json" onchange="replayGame(this.files[0])">
+        </div>
+        <br>
         <div id="winnerDisplay" style="font-size: 20px; color: green;"></div>
         <div id="currentTurn" style="font-size: 16px;"></div>
         <div id="gameBoard"></div>
