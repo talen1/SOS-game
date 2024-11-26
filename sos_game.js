@@ -7,6 +7,7 @@ let redScore = 0;
 let gameMode = 'simple';
 let ctx;
 let gameHistory = []; // To record game moves
+let isRecording = false; // Toggle recording feature
 
 function startNewGame() {
     boardSize = parseInt(document.getElementById('boardSize').value);
@@ -16,6 +17,7 @@ function startNewGame() {
     blueScore = 0;
     redScore = 0;
     gameMode = document.querySelector('input[name="gameMode"]:checked').value;
+    isRecording = document.getElementById('recordGame').checked; // Check if recording is enabled
     gameHistory = []; // Reset game history
     document.getElementById('winnerDisplay').textContent = '';
 
@@ -68,6 +70,7 @@ function drawBoard() {
             cell.textContent = board[i][j];
         }
     }
+    document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
 }
 
 function handleCellClick(event) {
@@ -83,7 +86,7 @@ function handleCellClick(event) {
         : document.querySelector('input[name="redPiece"]:checked').value;
 
     board[row][col] = piece;
-    gameHistory.push({ row, col, piece, player: currentPlayer }); // Log move
+    if (isRecording) gameHistory.push({ row, col, piece, player: currentPlayer }); // Log move
     drawBoard();
 
     const sosFormed = checkForSOS(row, col);
@@ -139,30 +142,6 @@ function checkForSOS(row, col) {
     return sosFound;
 }
 
-function isSOS(row, col, prev, current, next) {
-    const prevRow = row + prev[0];
-    const prevCol = col + prev[1];
-    const currentRow = row + current[0];
-    const currentCol = col + current[1];
-    const nextRow = row + next[0];
-    const nextCol = col + next[1];
-
-    if (
-        prevRow >= 0 && prevRow < boardSize &&
-        prevCol >= 0 && prevCol < boardSize &&
-        currentRow >= 0 && currentRow < boardSize &&
-        currentCol >= 0 && currentCol < boardSize &&
-        nextRow >= 0 && nextRow < boardSize &&
-        nextCol >= 0 && nextCol < boardSize
-    ) {
-        return board[prevRow][prevCol] === 'S' &&
-               board[currentRow][currentCol] === 'O' &&
-               board[nextRow][nextCol] === 'S';
-    }
-
-    return false;
-}
-
 function endGame(winner) {
     gameOver = true;
     let winnerText;
@@ -180,10 +159,11 @@ function endGame(winner) {
     }
 
     document.getElementById('winnerDisplay').textContent = winnerText;
-    recordGame(); // Save game history to a file
+
+    if (isRecording) saveGameHistory();
 }
 
-function recordGame() {
+function saveGameHistory() {
     const gameData = {
         boardSize,
         gameMode,
@@ -214,6 +194,50 @@ function replayGame(file) {
         });
     };
     reader.readAsText(file);
+}
+
+function isBothPlayersComputer() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return bluePlayerType === 'computer' && redPlayerType === 'computer';
+}
+
+function isComputerTurn() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return (currentPlayer === 'blue' && bluePlayerType === 'computer') || 
+           (currentPlayer === 'red' && redPlayerType === 'computer');
+}
+
+function makeComputerMove() {
+    let availableMoves = [];
+    for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+            if (board[i][j] === '') {
+                availableMoves.push([i, j]);
+            }
+        }
+    }
+
+    if (availableMoves.length > 0) {
+        const [row, col] = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        const piece = currentPlayer === 'blue'
+            ? document.querySelector('input[name="bluePiece"]:checked').value
+            : document.querySelector('input[name="redPiece"]:checked').value;
+
+        board[row][col] = piece;
+        if (isRecording) gameHistory.push({ row, col, piece, player: currentPlayer }); // Log move
+        drawBoard();
+
+        const sosFormed = checkForSOS(row, col);
+        if (!sosFormed) {
+            switchPlayer();
+        }
+
+        if (isBothPlayersComputer() && !gameOver) {
+            setTimeout(makeComputerMove, 500); // Continue if both players are computers
+        }
+    }
 }
 
 window.onload = startNewGame;
