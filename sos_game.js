@@ -112,13 +112,11 @@ function handleCellClick(event) {
             endGame(getWinnerByScore());
         }
     }
-
-    if (!gameOver && isComputerTurn()) {
-        setTimeout(makeComputerMove, 500);
-    }
 }
 
 function makeComputerMove() {
+    if (gameOver) return;
+
     let availableMoves = [];
     for (let i = 0; i < boardSize; i++) {
         for (let j = 0; j < boardSize; j++) {
@@ -153,8 +151,8 @@ function makeComputerMove() {
             }
         }
 
-        if (!gameOver && isComputerTurn()) {
-            setTimeout(makeComputerMove, 500);
+        if (!gameOver) {
+            switchPlayer();
         }
     }
 }
@@ -162,12 +160,15 @@ function makeComputerMove() {
 function playComputerVsComputer() {
     if (!gameOver) {
         makeComputerMove();
+        setTimeout(playComputerVsComputer, 500);
     }
 }
 
 function switchPlayer() {
     currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
     document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
+
+    // Trigger the computer move if it's the computer's turn
     if (isComputerTurn() && !gameOver) {
         setTimeout(makeComputerMove, 500);
     }
