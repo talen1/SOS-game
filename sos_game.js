@@ -147,10 +147,6 @@ function makeComputerMove() {
         if (gameMode === 'general') {
             if (sosFormed) {
                 updateScore();
-                if (!gameOver && isComputerTurn()) {
-                    setTimeout(makeComputerMove, 500);
-                    return;
-                }
             } else {
                 switchPlayer();
             }
