@@ -4,78 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOS Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        #gameContainer {
-            display: inline-block;
-            position: relative;
-            margin: 20px auto;
-        }
-        table {
-            border-collapse: collapse;
-            margin: auto;
-        }
-        td {
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            vertical-align: middle;
-            border: 1px solid black;
-            font-size: 20px;
-        }
-        canvas {
-            pointer-events: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        #winnerDisplay, #currentTurn {
-            margin-top: 10px;
-            font-size: 18px;
-        }
-    </style>
+    <link rel="stylesheet" href="sos_styles.css"> <!-- Link to the CSS file -->
 </head>
 <body>
     <h1>SOS Game</h1>
-    <div>
-        <label for="boardSize">Board size:</label>
+
+    <div class="controls">
+        <label for="boardSize">Board size: </label>
         <input type="number" id="boardSize" value="8" min="3">
-    </div>
-    <div>
-        <label>Select Game Mode:</label>
-        <input type="radio" name="gameMode" value="simple" checked> Simple Game
-        <input type="radio" name="gameMode" value="general"> General Game
-    </div>
-    <button onclick="startNewGame()">New Game</button>
-    <br><br>
-    <div>
-        <strong>Blue Player</strong><br>
-        <input type="radio" name="bluePlayerType" value="human" checked> Human
-        <input type="radio" name="bluePlayerType" value="computer"> Computer
         <br>
-        <input type="radio" name="bluePiece" value="S" checked> S
-        <input type="radio" name="bluePiece" value="O"> O
-    </div>
-    <div>
-        <strong>Red Player</strong><br>
-        <input type="radio" name="redPlayerType" value="human" checked> Human
-        <input type="radio" name="redPlayerType" value="computer"> Computer
+
+        <h3>Select Game Mode:</h3>
+        <label><input type="radio" name="gameMode" value="simple" checked> Simple Game</label>
+        <label><input type="radio" name="gameMode" value="general"> General Game</label>
         <br>
-        <input type="radio" name="redPiece" value="S" checked> S
-        <input type="radio" name="redPiece" value="O"> O
+
+        <button onclick="startNewGame()">New Game</button>
     </div>
-    <br>
-    <div id="gameContainer">
-        <div id="gameBoard"></div>
+
+    <div id="players" class="controls">
+        <!-- Blue Player Controls -->
+        <h3>Blue Player</h3>
+        <label><input type="radio" name="bluePlayerType" value="human" checked> Human</label>
+        <label><input type="radio" name="bluePlayerType" value="computer"> Computer</label>
+        <br>
+        <label><input type="radio" name="bluePiece" value="S" checked> S</label>
+        <label><input type="radio" name="bluePiece" value="O"> O</label>
+
+        <!-- Red Player Controls -->
+        <h3>Red Player</h3>
+        <label><input type="radio" name="redPlayerType" value="human" checked> Human</label>
+        <label><input type="radio" name="redPlayerType" value="computer"> Computer</label>
+        <br>
+        <label><input type="radio" name="redPiece" value="S" checked> S</label>
+        <label><input type="radio" name="redPiece" value="O"> O</label>
+    </div>
+
+    <div class="game-container">
+        <!-- Game Board Container -->
+        <div id="gameBoard" class="canvas-container"></div>
+        <!-- Canvas for drawing lines -->
         <canvas id="sosCanvas"></canvas>
     </div>
-    <div id="winnerDisplay"></div>
-    <div id="currentTurn"></div>
+
+    <div class="winner" id="winnerDisplay"></div>
+
+    <!-- JavaScript File -->
     <script src="sos_game.js"></script>
 </body>
 </html>
