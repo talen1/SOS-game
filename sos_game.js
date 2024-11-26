@@ -7,8 +7,8 @@ let blueScore = 0;
 let redScore = 0;
 let gameMode = 'simple';
 let ctx;
-let gameHistory = []; // Added for recording game history
-let isRecording = false; // Added to track if recording is enabled
+let gameHistory = []; // For recording moves
+let isRecording = false; // To enable/disable recording
 
 function startNewGame() {
     boardSize = parseInt(document.getElementById('boardSize').value);
@@ -18,11 +18,11 @@ function startNewGame() {
     blueScore = 0;
     redScore = 0;
     isRecording = document.getElementById('recordGame').checked;
-    gameHistory = []; // Reset history for a new game
+    gameHistory = []; // Reset game history
 
     document.getElementById('winnerDisplay').textContent = '';
     document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
-    document.getElementById('saveGameButton').disabled = true;
+    document.getElementById('saveGameButton').disabled = true; // Disable save button until the game ends
 
     setupCanvas();
     drawBoard();
@@ -72,7 +72,7 @@ function drawBoard() {
 }
 
 function handleCellClick(event) {
-    if (gameOver) return;
+    if (gameOver || isComputerTurn()) return;
 
     const row = parseInt(event.target.dataset.row);
     const col = parseInt(event.target.dataset.col);
@@ -85,21 +85,92 @@ function handleCellClick(event) {
 
     board[row][col] = piece;
     if (isRecording) {
-        gameHistory.push({ player: currentPlayer, row, col, piece }); // Record the move
+        gameHistory.push({ player: currentPlayer, row, col, piece }); // Record move
     }
 
     drawBoard();
 
-    if (checkForSOS(row, col)) {
-        if (gameMode === 'simple') {
+    const sosFormed = checkForSOS(row, col);
+
+    if (gameMode === 'simple') {
+        if (sosFormed) {
             endGame(currentPlayer);
+        } else if (isBoardFull()) {
+            endGame(null);
         } else {
-            updateScore();
+            switchPlayer();
         }
-    } else if (isBoardFull()) {
-        endGame(null);
-    } else {
-        switchPlayer();
+    } else if (gameMode === 'general') {
+        if (sosFormed) {
+            updateScore(); // Player continues turn if SOS is formed
+        } else {
+            switchPlayer();
+        }
+
+        if (isBoardFull()) {
+            endGame(getWinnerByScore());
+        }
+    }
+
+    // Trigger computer turn if applicable
+    if (!gameOver && isComputerTurn()) {
+        setTimeout(makeComputerMove, 500);
+    }
+}
+
+function makeComputerMove() {
+    if (gameOver) return;
+
+    let availableMoves = [];
+    for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+            if (board[i][j] === '') {
+                availableMoves.push([i, j]);
+            }
+        }
+    }
+
+    if (availableMoves.length > 0) {
+        const [row, col] = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        const piece = currentPlayer === 'blue'
+            ? document.querySelector('input[name="bluePiece"]:checked').value
+            : document.querySelector('input[name="redPiece"]:checked').value;
+
+        board[row][col] = piece;
+        if (isRecording) {
+            gameHistory.push({ player: currentPlayer, row, col, piece });
+        }
+
+        drawBoard();
+
+        const sosFormed = checkForSOS(row, col);
+
+        if (gameMode === 'simple') {
+            if (sosFormed) {
+                endGame(currentPlayer);
+                return;
+            }
+            if (isBoardFull()) {
+                endGame(null);
+                return;
+            }
+        } else if (gameMode === 'general') {
+            if (sosFormed) {
+                updateScore(); // Computer continues turn if SOS is formed
+            } else {
+                switchPlayer();
+            }
+        }
+
+        // Switch players if no SOS was formed
+        if (!gameOver && !sosFormed) {
+            switchPlayer();
+        }
+
+        // Trigger next computer move if needed
+        if (!gameOver && isComputerTurn()) {
+            setTimeout(makeComputerMove, 500);
+        }
     }
 }
 
@@ -120,6 +191,11 @@ function updateScore() {
 function switchPlayer() {
     currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
     document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
+
+    // Trigger computer turn if needed
+    if (isComputerTurn() && !gameOver) {
+        setTimeout(makeComputerMove, 500);
+    }
 }
 
 function endGame(winner) {
@@ -143,6 +219,13 @@ function endGame(winner) {
 
 function isBoardFull() {
     return board.every(row => row.every(cell => cell !== ''));
+}
+
+function isComputerTurn() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return (currentPlayer === 'blue' && bluePlayerType === 'computer') ||
+           (currentPlayer === 'red' && redPlayerType === 'computer');
 }
 
 function saveRecordedGame() {
