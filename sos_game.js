@@ -20,6 +20,7 @@ function startNewGame() {
     isRecording = document.getElementById('recordGame').checked; // Check if recording is enabled
     gameHistory = []; // Reset game history
     document.getElementById('winnerDisplay').textContent = '';
+    document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
 
     setupCanvas();
     drawBoard();
@@ -86,151 +87,34 @@ function handleCellClick(event) {
         : document.querySelector('input[name="redPiece"]:checked').value;
 
     board[row][col] = piece;
-    if (isRecording) gameHistory.push({ row, col, piece, player: currentPlayer }); // Log move
+    if (isRecording) gameHistory.push({ row, col, piece, player: currentPlayer }); // Log the move
     drawBoard();
 
     const sosFormed = checkForSOS(row, col);
 
     if (gameMode === 'simple') {
         if (sosFormed) {
-            endGame(currentPlayer); // Declare winner immediately
+            endGame(currentPlayer); // Declare winner immediately on SOS
         } else if (isBoardFull()) {
-            endGame(null); // Declare draw if board is full and no SOS
+            endGame(null); // Declare a draw if no SOS and the board is full
         } else {
-            switchPlayer();
+            switchPlayer(); // Alternate turns
         }
     } else if (gameMode === 'general') {
         if (sosFormed) {
-            updateScore(); // Update score for General Game
+            updateScore(); // Update score for the current player
         } else {
-            switchPlayer();
+            switchPlayer(); // Alternate turns if no SOS is formed
         }
 
         if (isBoardFull()) {
-            endGame(getWinnerByScore()); // Declare winner based on score
+            endGame(getWinnerByScore()); // Declare winner or draw based on scores
         }
     }
 
     if (!gameOver && isComputerTurn()) {
         setTimeout(makeComputerMove, 500);
     }
-}
-
-function switchPlayer() {
-    currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
-}
-
-function checkForSOS(row, col) {
-    const sosSequences = [
-        [[0, -2], [0, -1], [0, 1], [0, 2]], // Horizontal
-        [[-2, 0], [-1, 0], [1, 0], [2, 0]], // Vertical
-        [[-2, -2], [-1, -1], [1, 1], [2, 2]], // Diagonal \
-        [[-2, 2], [-1, 1], [1, -1], [2, -2]] // Diagonal /
-    ];
-
-    let sosFound = false;
-
-    sosSequences.forEach(direction => {
-        const [prev, current, next] = direction;
-        if (isSOS(row, col, prev, current, next)) {
-            sosFound = true;
-            drawSOSLine(row, col, prev, current, next);
-            updateScore();
-        }
-    });
-
-    return sosFound;
-}
-
-function isSOS(row, col, prev, current, next) {
-    const prevRow = row + prev[0];
-    const prevCol = col + prev[1];
-    const currentRow = row + current[0];
-    const currentCol = col + current[1];
-    const nextRow = row + next[0];
-    const nextCol = col + next[1];
-
-    if (
-        prevRow >= 0 && prevRow < boardSize &&
-        prevCol >= 0 && prevCol < boardSize &&
-        currentRow >= 0 && currentRow < boardSize &&
-        currentCol >= 0 && currentCol < boardSize &&
-        nextRow >= 0 && nextRow < boardSize &&
-        nextCol >= 0 && nextCol < boardSize
-    ) {
-        return board[prevRow][prevCol] === 'S' &&
-               board[currentRow][currentCol] === 'O' &&
-               board[nextRow][nextCol] === 'S';
-    }
-
-    return false;
-}
-
-function endGame(winner) {
-    gameOver = true;
-    let winnerText;
-
-    if (gameMode === 'simple') {
-        winnerText = winner 
-            ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!` 
-            : 'It\'s a draw!';
-    } else if (gameMode === 'general') {
-        winnerText = blueScore > redScore
-            ? 'Blue wins!'
-            : redScore > blueScore
-            ? 'Red wins!'
-            : 'It\'s a draw!';
-    }
-
-    document.getElementById('winnerDisplay').textContent = winnerText;
-
-    if (isRecording) saveGameHistory();
-}
-
-function saveGameHistory() {
-    const gameData = {
-        boardSize,
-        gameMode,
-        gameHistory,
-        winner: document.getElementById('winnerDisplay').textContent
-    };
-    const blob = new Blob([JSON.stringify(gameData, null, 2)], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'sos_game_record.json';
-    link.click();
-}
-
-function replayGame(file) {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-        const gameData = JSON.parse(event.target.result);
-        boardSize = gameData.boardSize;
-        gameMode = gameData.gameMode;
-        gameHistory = gameData.gameHistory;
-
-        startNewGame();
-        gameHistory.forEach((move, index) => {
-            setTimeout(() => {
-                board[move.row][move.col] = move.piece;
-                drawBoard();
-            }, index * 500);
-        });
-    };
-    reader.readAsText(file);
-}
-
-function isBothPlayersComputer() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return bluePlayerType === 'computer' && redPlayerType === 'computer';
-}
-
-function isComputerTurn() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return (currentPlayer === 'blue' && bluePlayerType === 'computer') || 
-           (currentPlayer === 'red' && redPlayerType === 'computer');
 }
 
 function makeComputerMove() {
@@ -254,9 +138,20 @@ function makeComputerMove() {
         drawBoard();
 
         const sosFormed = checkForSOS(row, col);
+
         if (gameMode === 'simple' && sosFormed) {
             endGame(currentPlayer);
             return; // Stop further moves
+        }
+
+        if (gameMode === 'general') {
+            if (sosFormed) {
+                updateScore(); // Update score for General Game
+                if (!gameOver && isComputerTurn()) {
+                    setTimeout(makeComputerMove, 500); // Let the computer continue its turn
+                }
+                return;
+            }
         }
 
         if (!gameOver) {
@@ -266,6 +161,104 @@ function makeComputerMove() {
             }
         }
     }
+}
+
+function switchPlayer() {
+    currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
+    document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
+}
+
+function updateScore() {
+    if (currentPlayer === 'blue') {
+        blueScore++;
+    } else {
+        redScore++;
+    }
+    document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
+}
+
+function isBoardFull() {
+    return board.every(row => row.every(cell => cell !== ''));
+}
+
+function getWinnerByScore() {
+    if (blueScore > redScore) return 'blue';
+    if (redScore > blueScore) return 'red';
+    return null; // Draw
+}
+
+function endGame(winner) {
+    gameOver = true;
+    let winnerText = '';
+
+    if (gameMode === 'simple') {
+        winnerText = winner
+            ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!`
+            : 'It\'s a draw!';
+    } else if (gameMode === 'general') {
+        winnerText = winner
+            ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!`
+            : 'It\'s a draw!';
+    }
+
+    document.getElementById('winnerDisplay').textContent = winnerText;
+
+    if (isRecording) saveGameHistory();
+}
+
+function saveGameHistory() {
+    const gameData = {
+        boardSize,
+        gameMode,
+        blueScore,
+        redScore,
+        gameHistory,
+        winner: document.getElementById('winnerDisplay').textContent
+    };
+    const blob = new Blob([JSON.stringify(gameData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'sos_game_record.json';
+    link.click();
+}
+
+function replayGame(file) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const gameData = JSON.parse(event.target.result);
+        boardSize = gameData.boardSize;
+        gameMode = gameData.gameMode;
+        blueScore = gameData.blueScore;
+        redScore = gameData.redScore;
+        gameHistory = gameData.gameHistory;
+
+        startNewGame();
+        gameHistory.forEach((move, index) => {
+            setTimeout(() => {
+                board[move.row][move.col] = move.piece;
+                drawBoard();
+            }, index * 500);
+        });
+
+        setTimeout(() => {
+            document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
+            document.getElementById('winnerDisplay').textContent = gameData.winner;
+        }, gameHistory.length * 500);
+    };
+    reader.readAsText(file);
+}
+
+function isBothPlayersComputer() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return bluePlayerType === 'computer' && redPlayerType === 'computer';
+}
+
+function isComputerTurn() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return (currentPlayer === 'blue' && bluePlayerType === 'computer') || 
+           (currentPlayer === 'red' && redPlayerType === 'computer');
 }
 
 window.onload = startNewGame;
