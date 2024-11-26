@@ -6,7 +6,7 @@ let blueScore = 0;
 let redScore = 0;
 let gameMode = 'simple';
 let ctx;
-let gameHistory = []; // Stores game moves for replay
+let gameHistory = []; // To record game moves
 
 function startNewGame() {
     boardSize = parseInt(document.getElementById('boardSize').value);
@@ -90,7 +90,7 @@ function handleCellClick(event) {
 
     if (gameMode === 'simple') {
         if (sosFormed) {
-            endGame(currentPlayer); // Declare winner immediately on SOS
+            endGame(currentPlayer); // Declare winner immediately
         } else if (isBoardFull()) {
             endGame(null); // Declare draw if board is full and no SOS
         } else {
@@ -98,7 +98,7 @@ function handleCellClick(event) {
         }
     } else if (gameMode === 'general') {
         if (sosFormed) {
-            updateScore(); // Score is updated in checkForSOS
+            updateScore(); // Update score for General Game
         } else {
             switchPlayer();
         }
@@ -163,36 +163,6 @@ function isSOS(row, col, prev, current, next) {
     return false;
 }
 
-function drawSOSLine(row, col, prev, current, next) {
-    const table = document.querySelector('table');
-    const cellSize = table.rows[0].cells[0].offsetWidth;
-    const color = currentPlayer === 'blue' ? 'blue' : 'red';
-
-    const startX = (col + next[1] + 0.5) * cellSize;
-    const startY = (row + next[0] + 0.5) * cellSize;
-    const endX = (col + prev[1] + 0.5) * cellSize;
-    const endY = (row + prev[0] + 0.5) * cellSize;
-
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(endX, endY);
-    ctx.stroke();
-}
-
-function updateScore() {
-    if (currentPlayer === 'blue') {
-        blueScore++;
-    } else {
-        redScore++;
-    }
-}
-
-function isBoardFull() {
-    return board.every(row => row.every(cell => cell !== ''));
-}
-
 function endGame(winner) {
     gameOver = true;
     let winnerText;
@@ -244,60 +214,6 @@ function replayGame(file) {
         });
     };
     reader.readAsText(file);
-}
-
-function getWinnerByScore() {
-    return blueScore > redScore ? 'blue' : redScore > blueScore ? 'red' : null; // Determine winner by score
-}
-
-function isComputerTurn() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return (currentPlayer === 'blue' && bluePlayerType === 'computer') || 
-           (currentPlayer === 'red' && redPlayerType === 'computer');
-}
-
-function makeComputerMove() {
-    let availableMoves = [];
-    for (let i = 0; i < boardSize; i++) {
-        for (let j = 0; j < boardSize; j++) {
-            if (board[i][j] === '') {
-                availableMoves.push([i, j]);
-            }
-        }
-    }
-
-    if (availableMoves.length > 0) {
-        const [row, col] = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-        const piece = currentPlayer === 'blue'
-            ? document.querySelector('input[name="bluePiece"]:checked').value
-            : document.querySelector('input[name="redPiece"]:checked').value;
-
-        board[row][col] = piece;
-        gameHistory.push({ row, col, piece, player: currentPlayer }); // Log move
-        drawBoard();
-
-        const sosFormed = checkForSOS(row, col);
-        if (!sosFormed) {
-            switchPlayer();
-        }
-
-        if (isBothPlayersComputer() && !gameOver) {
-            setTimeout(makeComputerMove, 500); // Continue if both players are computers
-        }
-    }
-}
-
-function isBothPlayersComputer() {
-    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
-    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
-    return bluePlayerType === 'computer' && redPlayerType === 'computer';
-}
-
-function playComputerVsComputer() {
-    if (isBothPlayersComputer() && !gameOver) {
-        makeComputerMove(); // Start computer vs. computer gameplay
-    }
 }
 
 window.onload = startNewGame;
