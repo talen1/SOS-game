@@ -168,6 +168,9 @@ function playComputerVsComputer() {
 function switchPlayer() {
     currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
     document.getElementById('currentTurn').textContent = `Current turn: ${currentPlayer}`;
+    if (isComputerTurn() && !gameOver) {
+        setTimeout(makeComputerMove, 500);
+    }
 }
 
 function isComputerTurn() {
