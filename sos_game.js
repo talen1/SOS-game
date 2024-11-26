@@ -6,6 +6,7 @@ let blueScore = 0;
 let redScore = 0;
 let gameMode = 'simple';
 let ctx;
+let gameHistory = []; // Stores game moves for replay
 
 function startNewGame() {
     boardSize = parseInt(document.getElementById('boardSize').value);
@@ -15,6 +16,7 @@ function startNewGame() {
     blueScore = 0;
     redScore = 0;
     gameMode = document.querySelector('input[name="gameMode"]:checked').value;
+    gameHistory = []; // Reset game history
     document.getElementById('winnerDisplay').textContent = '';
 
     setupCanvas();
@@ -81,6 +83,7 @@ function handleCellClick(event) {
         : document.querySelector('input[name="redPiece"]:checked').value;
 
     board[row][col] = piece;
+    gameHistory.push({ row, col, piece, player: currentPlayer }); // Log move
     drawBoard();
 
     const sosFormed = checkForSOS(row, col);
@@ -207,6 +210,40 @@ function endGame(winner) {
     }
 
     document.getElementById('winnerDisplay').textContent = winnerText;
+    recordGame(); // Save game history to a file
+}
+
+function recordGame() {
+    const gameData = {
+        boardSize,
+        gameMode,
+        gameHistory,
+        winner: document.getElementById('winnerDisplay').textContent
+    };
+    const blob = new Blob([JSON.stringify(gameData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'sos_game_record.json';
+    link.click();
+}
+
+function replayGame(file) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const gameData = JSON.parse(event.target.result);
+        boardSize = gameData.boardSize;
+        gameMode = gameData.gameMode;
+        gameHistory = gameData.gameHistory;
+
+        startNewGame();
+        gameHistory.forEach((move, index) => {
+            setTimeout(() => {
+                board[move.row][move.col] = move.piece;
+                drawBoard();
+            }, index * 500);
+        });
+    };
+    reader.readAsText(file);
 }
 
 function getWinnerByScore() {
@@ -237,6 +274,7 @@ function makeComputerMove() {
             : document.querySelector('input[name="redPiece"]:checked').value;
 
         board[row][col] = piece;
+        gameHistory.push({ row, col, piece, player: currentPlayer }); // Log move
         drawBoard();
 
         const sosFormed = checkForSOS(row, col);
