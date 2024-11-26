@@ -5,9 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOS Game</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        #gameContainer {
+            display: inline-block;
+            position: relative;
+            margin: 20px auto;
+        }
         table {
             border-collapse: collapse;
-            margin: 20px auto;
+            margin: auto;
         }
         td {
             width: 40px;
@@ -20,11 +31,12 @@
         canvas {
             pointer-events: none;
             position: absolute;
+            top: 0;
+            left: 0;
         }
-        #gameContainer {
-            position: relative;
-            width: max-content;
-            margin: 20px auto;
+        #winnerDisplay, #currentTurn {
+            margin-top: 10px;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -57,12 +69,13 @@
         <input type="radio" name="redPiece" value="S" checked> S
         <input type="radio" name="redPiece" value="O"> O
     </div>
+    <br>
     <div id="gameContainer">
         <div id="gameBoard"></div>
         <canvas id="sosCanvas"></canvas>
     </div>
-    <div id="winnerDisplay" style="font-size: 20px; color: green; margin-top: 10px;"></div>
-    <div id="currentTurn" style="font-size: 16px; margin-top: 10px;"></div>
+    <div id="winnerDisplay"></div>
+    <div id="currentTurn"></div>
     <script src="sos_game.js"></script>
 </body>
 </html>
