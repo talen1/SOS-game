@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOS Game</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+        }
         table {
             border-collapse: collapse;
             margin: 20px auto;
@@ -29,41 +34,49 @@
             font-size: 18px;
             text-align: center;
         }
+        #controls {
+            margin: 20px 0;
+        }
+        #controls div {
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">SOS Game</h1>
-    <div style="text-align: center;">
-        <label for="boardSize">Board size:</label>
-        <input type="number" id="boardSize" value="8" min="3">
-    </div>
-    <div>
-        <label>Select Game Mode:</label>
-        <input type="radio" name="gameMode" value="simple" checked> Simple Game
-        <input type="radio" name="gameMode" value="general"> General Game
-    </div>
-    <div>
-        <strong>Blue Player</strong><br>
-        <input type="radio" name="bluePlayerType" value="human" checked> Human
-        <input type="radio" name="bluePlayerType" value="computer"> Computer
-        <br>
-        <input type="radio" name="bluePiece" value="S" checked> S
-        <input type="radio" name="bluePiece" value="O"> O
-    </div>
-    <div>
-        <strong>Red Player</strong><br>
-        <input type="radio" name="redPlayerType" value="human" checked> Human
-        <input type="radio" name="redPlayerType" value="computer"> Computer
-        <br>
-        <input type="radio" name="redPiece" value="S" checked> S
-        <input type="radio" name="redPiece" value="O"> O
-    </div>
-    <div>
-        <input type="checkbox" id="recordGame"> Record game
-    </div>
-    <div>
-        <button onclick="startNewGame()">New Game</button>
-        <button id="saveGameButton" onclick="saveRecordedGame()" disabled>Save Game</button>
+    <h1>SOS Game</h1>
+    <div id="controls">
+        <div>
+            <label for="boardSize">Board size:</label>
+            <input type="number" id="boardSize" value="8" min="3">
+        </div>
+        <div>
+            <label>Select Game Mode:</label>
+            <input type="radio" name="gameMode" value="simple" checked> Simple Game
+            <input type="radio" name="gameMode" value="general"> General Game
+        </div>
+        <div>
+            <strong>Blue Player</strong><br>
+            <input type="radio" name="bluePlayerType" value="human" checked> Human
+            <input type="radio" name="bluePlayerType" value="computer"> Computer
+            <br>
+            <input type="radio" name="bluePiece" value="S" checked> S
+            <input type="radio" name="bluePiece" value="O"> O
+        </div>
+        <div>
+            <strong>Red Player</strong><br>
+            <input type="radio" name="redPlayerType" value="human" checked> Human
+            <input type="radio" name="redPlayerType" value="computer"> Computer
+            <br>
+            <input type="radio" name="redPiece" value="S" checked> S
+            <input type="radio" name="redPiece" value="O"> O
+        </div>
+        <div>
+            <input type="checkbox" id="recordGame"> Record game
+        </div>
+        <div>
+            <button onclick="startNewGame()">New Game</button>
+            <button id="saveGameButton" onclick="saveRecordedGame()" disabled>Save Game</button>
+        </div>
     </div>
     <div id="gameBoard"></div>
     <div id="winnerDisplay"></div>
