@@ -10,81 +10,96 @@
             text-align: center;
         }
         table {
+            margin: 0 auto;
             border-collapse: collapse;
-            margin: 20px auto;
         }
         td {
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            vertical-align: middle;
+            width: 30px;
+            height: 30px;
             border: 1px solid black;
+            text-align: center;
             font-size: 20px;
         }
         canvas {
             pointer-events: none;
-            position: absolute;
         }
         #gameBoard {
             position: relative;
-        }
-        #winnerDisplay, #currentTurn {
-            margin-top: 10px;
-            font-size: 18px;
-            text-align: center;
-        }
-        #controls {
-            margin: 20px 0;
-        }
-        #controls div {
-            margin-bottom: 15px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
     <h1>SOS Game</h1>
-    <div id="controls">
-        <div>
-            <label for="boardSize">Board size:</label>
-            <input type="number" id="boardSize" value="8" min="3">
-        </div>
-        <div>
-            <label>Select Game Mode:</label>
-            <input type="radio" name="gameMode" value="simple" checked> Simple Game
-            <input type="radio" name="gameMode" value="general"> General Game
-        </div>
-        <div>
-            <strong>Blue Player</strong><br>
-            <input type="radio" name="bluePlayerType" value="human" checked> Human
-            <input type="radio" name="bluePlayerType" value="computer"> Computer
-            <br>
-            <input type="radio" name="bluePiece" value="S" checked> S
-            <input type="radio" name="bluePiece" value="O"> O
-        </div>
-        <div>
-            <strong>Red Player</strong><br>
-            <input type="radio" name="redPlayerType" value="human" checked> Human
-            <input type="radio" name="redPlayerType" value="computer"> Computer
-            <br>
-            <input type="radio" name="redPiece" value="S" checked> S
-            <input type="radio" name="redPiece" value="O"> O
-        </div>
-        <div>
-            <input type="checkbox" id="recordGame"> Record game
-        </div>
-        <div>
-            <button onclick="startNewGame()">New Game</button>
-            <button id="saveGameButton" onclick="saveRecordedGame()" disabled>Save Game</button>
-        </div>
-        <div>
-            <label for="importGame">Import game:</label>
-            <input type="file" id="importGame" accept=".json">
-            <button onclick="importGame()">Load Game</button>
-        </div>
+
+    <label for="boardSize">Board size:</label>
+    <input type="number" id="boardSize" value="8" min="3" max="20">
+
+    <div>
+        <label>Select Game Mode:</label>
+        <input type="radio" name="gameMode" value="simple" checked> Simple Game
+        <input type="radio" name="gameMode" value="general"> General Game
     </div>
+
+    <div>
+        <button onclick="startNewGame()">New Game</button>
+    </div>
+
+    <div>
+        <h3>Blue Player</h3>
+        <label>
+            <input type="radio" name="bluePlayerType" value="human" checked> Human
+        </label>
+        <label>
+            <input type="radio" name="bluePlayerType" value="computer"> Computer
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="bluePiece" value="S" checked> S
+        </label>
+        <label>
+            <input type="radio" name="bluePiece" value="O"> O
+        </label>
+    </div>
+
+    <div>
+        <h3>Red Player</h3>
+        <label>
+            <input type="radio" name="redPlayerType" value="human" checked> Human
+        </label>
+        <label>
+            <input type="radio" name="redPlayerType" value="computer"> Computer
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="redPiece" value="S" checked> S
+        </label>
+        <label>
+            <input type="radio" name="redPiece" value="O"> O
+        </label>
+    </div>
+
+    <div>
+        <label for="recordGame">
+            <input type="checkbox" id="recordGame"> Record Game
+        </label>
+    </div>
+
+    <div>
+        <label for="importGame">Import Game:</label>
+        <input type="file" id="importGame" accept=".json">
+        <button onclick="importGame()">Load Game</button>
+    </div>
+
+    <div>
+        <button id="saveGameButton" onclick="saveRecordedGame()" disabled>Save Recorded Game</button>
+    </div>
+
+    <h3 id="currentTurn">Current turn: blue</h3>
+    <h3 id="winnerDisplay"></h3>
+
     <div id="gameBoard"></div>
-    <div id="winnerDisplay"></div>
-    <div id="currentTurn"></div>
+
     <script src="sos_game.js"></script>
 </body>
 </html>
