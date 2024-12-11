@@ -5,27 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOS Game</title>
     <style>
+        /* General body styling */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #c3ecf1, #dee7f7);
             text-align: center;
+            margin: 0;
+            padding: 0;
+            color: #333;
         }
+
+        /* Header */
+        h1 {
+            font-size: 2.5rem;
+            color: #00509e;
+            margin-top: 20px;
+        }
+
+        h3 {
+            color: #444;
+        }
+
+        /* Game board styling */
         table {
-            margin: 0 auto;
+            margin: 20px auto;
             border-collapse: collapse;
+            background-color: #f7f9fc;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
+
         td {
-            width: 30px;
-            height: 30px;
-            border: 1px solid black;
+            width: 50px;
+            height: 50px;
+            border: 2px solid #00509e;
             text-align: center;
-            font-size: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
         }
+
+        td:hover {
+            background-color: #cce4f7;
+            cursor: pointer;
+        }
+
         canvas {
             pointer-events: none;
         }
+
         #gameBoard {
             position: relative;
             display: inline-block;
+        }
+
+        /* Control section styling */
+        button, input[type="number"], select {
+            font-family: 'Arial', sans-serif;
+            padding: 10px 15px;
+            margin: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #00509e;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover, input[type="number"]:hover, select:hover {
+            background-color: #003f7e;
+        }
+
+        input[type="checkbox"], input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        /* Footer styling */
+        footer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #00509e;
+            color: white;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -113,6 +174,10 @@
     <h3 id="winnerDisplay"></h3>
 
     <div id="gameBoard"></div>
+
+    <footer>
+        SOS Game © 2024
+    </footer>
 
     <script src="sos_game.js"></script>
 </body>
