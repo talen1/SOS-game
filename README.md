@@ -31,8 +31,7 @@ Welcome to the **SOS Game**, a modern twist on the classic game! This implementa
 - Customize each player's piece as "S" or "O".  
 
 ### 💡 **Educational Note**  
-- Learn about the **LLM-powered opponent** in the "About" section.  
-- A special **thank-you message** to your professor for their support and evaluation.  
+- Learn about the **LLM-powered opponent** in the "About" section.
 
 ---
 
