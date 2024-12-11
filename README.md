@@ -1,55 +1,70 @@
-# SOS Game 🎮
+# **SOS Game** 🎮  
 
-Welcome to the **SOS Game**, an exciting implementation of the classic SOS game with modern features like LLM-powered computer opponents, difficulty levels, and game recording! This game is perfect for both casual players and those looking for a strategic challenge.
-
----
-
-## **Game Overview**
-The SOS Game is a board game where players take turns placing "S" or "O" on a grid. The goal is to form "SOS" in a straight line, either horizontally, vertically, or diagonally.
+Welcome to the **SOS Game**, a modern twist on the classic game! This implementation includes exciting features like LLM-powered computer opponents, difficulty levels, and game recording, offering fun for casual players and strategic enthusiasts alike.
 
 ---
 
-## **Features**
-### 🧠 **LLM-Powered Computer Opponent**
-- The computer opponent leverages a **Large Language Model (LLM)** to make strategic moves based on the board state.
-- Difficulty Levels:
-  - **Easy**: Random moves.
-  - **Medium**: Prioritizes forming "SOS" or blocking the opponent.
-  - **Hard**: Uses advanced strategies to maximize score.
+## **Features**  
 
-### 📋 **Game Modes**
-- **Simple Game**: The game ends when the first "SOS" is formed.
-- **General Game**: The game continues until the board is full, and the player with the most "SOS" formations wins.
+### 🧠 **LLM-Powered Computer Opponent**  
+- **Smart AI**: Leverages a **Large Language Model (LLM)** to make strategic moves.  
+- **Difficulty Levels**:  
+  - **Easy**: Random moves for a relaxed experience.  
+  - **Medium**: Prioritizes forming "SOS" or blocking opponents.  
+  - **Hard**: Employs advanced strategies for maximum challenge.  
 
-### 🔄 **Record and Replay Games**
-- Record your gameplay and save it as a `.json` file.
-- Import and replay saved games to analyze moves or relive exciting moments.
+### 📋 **Game Modes**  
+- **Simple Game**: Ends as soon as the first "SOS" is formed.  
+- **General Game**: Continues until the board is full. The player with the most "SOS" formations wins.  
 
-### 🎨 **Enhanced Visuals**
-- A modern design with a gradient background, stylish buttons, and hover effects.
-- Subtle shadows and rounded corners for a polished look.
+### 🔄 **Game Recording and Replay**  
+- **Record**: Save gameplay as a `.json` file for future analysis or enjoyment.  
+- **Replay**: Import and replay saved games to review strategies and key moments.  
 
-### 📝 **Player Settings**
-- Choose between **Human** or **Computer** for each player.
-- Customize the piece ("S" or "O") for each player.
+### 🎨 **Enhanced Visual Design**  
+- **Modern Aesthetics**:  
+  - Gradient background, polished buttons, and hover effects.  
+  - Subtle shadows and rounded corners for a sleek interface.  
 
-### 💡 **Additional Information**
-- A dedicated section explains the LLM-powered opponent and its functionality.
-- A thank-you message for your professor for playing the game.
+### 📝 **Player Customization**  
+- Choose between **Human** or **Computer** players.  
+- Customize each player's piece as "S" or "O".  
 
----
-
-## **How to Play**
-1. Select the **Board Size** and **Game Mode**.
-2. Configure the players (Human or Computer) and their difficulty levels.
-3. Click **New Game** to start.
-4. Take turns placing "S" or "O" on the board to form "SOS".
-5. View the winner or save and replay your game using the provided buttons.
+### 💡 **Educational Note**  
+- Learn about the **LLM-powered opponent** in the "About" section.  
+- A special **thank-you message** to your professor for their support and evaluation.  
 
 ---
 
-## **Setup Instructions**
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/talen1/sos-game.git
-   cd sos-game
+## **How to Play**  
+
+1. **Set Up**:  
+   - Choose a **board size** and game mode (Simple or General).  
+   - Configure players (Human or Computer) and their difficulty levels.  
+
+2. **Gameplay**:  
+   - Take turns placing "S" or "O" on the board to form "SOS".  
+   - Watch the **LLM-powered opponent** make its strategic moves!  
+
+3. **End Game**:  
+   - View the winner or declare a draw when the board is full.  
+   - Save the game or replay previously saved games.  
+
+---
+
+## **Click Here to Play** 🔗  
+
+- [**Play the SOS Game**](https://your-username.github.io/sos-game/)  
+
+> Click the link above to open the game in a new tab and start playing!  
+
+---
+
+## **Setup Instructions**  
+
+### **Clone the Repository**  
+Run the following commands in your terminal:  
+
+```bash
+git clone https://github.com/your-username/sos-game.git
+cd sos-game
