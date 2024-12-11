@@ -54,17 +54,8 @@ Welcome to the **SOS Game**, a modern twist on the classic game! This implementa
 
 ## **Click Here to Play** 🔗  
 
-- [**Play the SOS Game**](https://your-username.github.io/sos-game/)  
+- [**Play the SOS Game**](https://talen1.github.io/SOS-game/)  
 
 > Click the link above to open the game in a new tab and start playing!  
 
 ---
-
-## **Setup Instructions**  
-
-### **Clone the Repository**  
-Run the following commands in your terminal:  
-
-```bash
-git clone https://github.com/your-username/sos-game.git
-cd sos-game
