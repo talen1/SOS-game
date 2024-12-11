@@ -269,6 +269,139 @@ function isComputerTurn() {
     return false;
 }
 
-// Existing helper functions...
+function isBothPlayersComputer() {
+    const bluePlayerType = document.querySelector('input[name="bluePlayerType"]:checked').value;
+    const redPlayerType = document.querySelector('input[name="redPlayerType"]:checked').value;
+    return bluePlayerType === 'computer' && redPlayerType === 'computer';
+}
+
+function playComputerVsComputer() {
+    if (!gameOver) {
+        makeComputerMoveWithLLM();
+        if (!gameOver) {
+            setTimeout(playComputerVsComputer, 500);
+        }
+    }
+}
+
+function checkForSOS(row, col) {
+    return false; // Placeholder logic
+}
+
+function updateScore() {
+    if (currentPlayer === 'blue') {
+        blueScore++;
+    } else {
+        redScore++;
+    }
+    document.getElementById('currentTurn').textContent = `Blue Score: ${blueScore}, Red Score: ${redScore}`;
+}
+
+function endGame(winner) {
+    gameOver = true;
+
+    const winnerText = winner
+        ? `${winner.charAt(0).toUpperCase() + winner.slice(1)} wins!`
+        : 'It\'s a draw!';
+    document.getElementById('winnerDisplay').textContent = winnerText;
+
+    if (isRecording) {
+        gameHistory.push({
+            type: 'end',
+            winner: winner,
+            boardState: board.map(row => [...row]),
+            mode: gameMode
+        });
+        document.getElementById('saveGameButton').disabled = false;
+    }
+}
+
+function isBoardFull() {
+    return board.every(row => row.every(cell => cell !== ''));
+}
+
+function saveRecordedGame() {
+    if (!gameHistory.length) return;
+
+    const gameData = {
+        boardSize,
+        gameMode,
+        blueScore,
+        redScore,
+        moves: gameHistory
+    };
+
+    const blob = new Blob([JSON.stringify(gameData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'sos_game_record.json';
+    link.click();
+}
+
+function importGame() {
+    const fileInput = document.getElementById('importGame');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert('Please select a file to import.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const gameData = JSON.parse(e.target.result);
+
+            if (!validateGameData(gameData)) {
+                alert('Invalid game file format.');
+                return;
+            }
+
+            boardSize = gameData.boardSize;
+            gameMode = gameData.gameMode;
+            blueScore = gameData.blueScore || 0;
+            redScore = gameData.redScore || 0;
+            board = Array(boardSize).fill().map(() => Array(boardSize).fill(''));
+            currentPlayer = 'blue';
+            gameOver = false;
+
+            setupCanvas();
+            drawBoard();
+
+            replayMoves(gameData.moves);
+
+        } catch (error) {
+            console.error('Error importing game:', error);
+            alert('Failed to import game.');
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+function validateGameData(gameData) {
+    return gameData &&
+        typeof gameData.boardSize === 'number' &&
+        Array.isArray(gameData.moves) &&
+        typeof gameData.gameMode === 'string' &&
+        (gameData.gameMode === 'simple' || gameData.gameMode === 'general');
+}
+
+function replayMoves(moves) {
+    for (let i = 0; i < moves.length; i++) {
+        const move = moves[i];
+        const { player, row, col, piece } = move;
+
+        board[row][col] = piece;
+
+        drawBoard();
+
+        if (i < moves.length - 1) {
+            setTimeout(() => {}, 500);
+        }
+    }
+
+    document.getElementById('currentTurn').textContent = `Game Imported: ${gameMode.toUpperCase()} Mode`;
+}
 
 window.onload = startNewGame;
