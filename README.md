@@ -1,20 +1,55 @@
-# SOS Game
+# SOS Game 🎮
 
-SOS Game created in sprints.
+Welcome to the **SOS Game**, an exciting implementation of the classic SOS game with modern features like LLM-powered computer opponents, difficulty levels, and game recording! This game is perfect for both casual players and those looking for a strategic challenge.
 
-## How to Play
+---
 
-1. Choose the board size and player types (Human or Computer).
-2. Select which letter each player will place ("S" or "O").
-3. Click on the board to place your letter and attempt to form the SOS sequence.
-4. The first player to form an SOS sequence (in Simple mode) wins the game, or the player with the most SOS sequences wins (in General mode).
+## **Game Overview**
+The SOS Game is a board game where players take turns placing "S" or "O" on a grid. The goal is to form "SOS" in a straight line, either horizontally, vertically, or diagonally.
 
-### Play the Game Online
+---
 
-You can play the game directly by visiting [this link](https://talen1.github.io/SOS-game/).
+## **Features**
+### 🧠 **LLM-Powered Computer Opponent**
+- The computer opponent leverages a **Large Language Model (LLM)** to make strategic moves based on the board state.
+- Difficulty Levels:
+  - **Easy**: Random moves.
+  - **Medium**: Prioritizes forming "SOS" or blocking the opponent.
+  - **Hard**: Uses advanced strategies to maximize score.
 
-### Platforms Used
+### 📋 **Game Modes**
+- **Simple Game**: The game ends when the first "SOS" is formed.
+- **General Game**: The game continues until the board is full, and the player with the most "SOS" formations wins.
 
-- HTML5
-- JavaScript
-- Canvas for drawing SOS lines
+### 🔄 **Record and Replay Games**
+- Record your gameplay and save it as a `.json` file.
+- Import and replay saved games to analyze moves or relive exciting moments.
+
+### 🎨 **Enhanced Visuals**
+- A modern design with a gradient background, stylish buttons, and hover effects.
+- Subtle shadows and rounded corners for a polished look.
+
+### 📝 **Player Settings**
+- Choose between **Human** or **Computer** for each player.
+- Customize the piece ("S" or "O") for each player.
+
+### 💡 **Additional Information**
+- A dedicated section explains the LLM-powered opponent and its functionality.
+- A thank-you message for your professor for playing the game.
+
+---
+
+## **How to Play**
+1. Select the **Board Size** and **Game Mode**.
+2. Configure the players (Human or Computer) and their difficulty levels.
+3. Click **New Game** to start.
+4. Take turns placing "S" or "O" on the board to form "SOS".
+5. View the winner or save and replay your game using the provided buttons.
+
+---
+
+## **Setup Instructions**
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/talen1/sos-game.git
+   cd sos-game
